@@ -30,7 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
@@ -43,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Angle.cs" />
     <Compile Include="MyPoint.cs" />
+    <Compile Include="WayItem.cs" />
     <Compile Include="Way.cs" />
     <Compile Include="WayImager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,9 +1,0 @@
-c:\users\1nf\documents\visual studio 2015\Projects\ImagesWF\ImagesWF\bin\Debug\ImagesWF.exe.config
-c:\users\1nf\documents\visual studio 2015\Projects\ImagesWF\ImagesWF\bin\Debug\ImagesWF.exe
-c:\users\1nf\documents\visual studio 2015\Projects\ImagesWF\ImagesWF\bin\Debug\ImagesWF.pdb
-c:\users\1nf\documents\visual studio 2015\Projects\ImagesWF\ImagesWF\obj\Debug\ImagesWF.csprojResolveAssemblyReference.cache
-c:\users\1nf\documents\visual studio 2015\Projects\ImagesWF\ImagesWF\obj\Debug\ImagesWF.Form1.resources
-c:\users\1nf\documents\visual studio 2015\Projects\ImagesWF\ImagesWF\obj\Debug\ImagesWF.Properties.Resources.resources
-c:\users\1nf\documents\visual studio 2015\Projects\ImagesWF\ImagesWF\obj\Debug\ImagesWF.csproj.GenerateResource.Cache
-c:\users\1nf\documents\visual studio 2015\Projects\ImagesWF\ImagesWF\obj\Debug\ImagesWF.exe
-c:\users\1nf\documents\visual studio 2015\Projects\ImagesWF\ImagesWF\obj\Debug\ImagesWF.pdb

@@ -8,49 +8,69 @@
     using System.IO;
     using System.Linq;
     using System.Net;
+    using System.Text;
+    using System.Windows.Media;
+    using System.Windows.Media.Imaging;
 
     public abstract class WayImager
     {
         public static List<Way> Ways { get; }
-        public static List<MyPoint> Points { get; }
         public static decimal Speed { get; set; }
         public static string Path { get; set; }
         public static float SpeedW { get; set; }
+        public static int SpeedH { get; set; }
 
-        const int size = 450;
+        private static WebClient webClient;
+
+        const int size = 900;
 
         static WayImager()
         {
-            Points = new List<MyPoint>();
+            webClient = new WebClient();
+            webClient.Headers.Add("User-Agent: Other");
             Ways = new List<Way>();
             Speed = 0.0003m;
             SpeedW = 20;
             Path = "img";
         }
 
-        public static void MakeWays()
+        public static ImageSource CreatePreview(List<WayItem> WayItems)
         {
-            if (Points.Count < 2)
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendFormat("|{0:f6},{1:f6}", WayItems[0].lat1, WayItems[0].lon1);
+
+            for (int i = 0; i < WayItems.Count; i++)
             {
-                throw new Exception("Not enought points!");
+                sb.AppendFormat("|{0:f6},{1:f6}", WayItems[i].lat2, WayItems[i].lon2);
             }
 
-            Directory.CreateDirectory(Path);
+            Uri uri = new Uri($"http://maps.googleapis.com/maps/api/staticmap?path=color:0xff0000|weight:5{sb.ToString()}&scale=2&format=png&size=1280x1280&maptype=satellite");
+
+            return new BitmapImage(uri);
+        }
+
+        public static void MakeWays(List<WayItem> WayItems)
+        {
             Ways.Clear();
-            for (int i = 1; i < Points.Count; i++)
+
+            for (int i = 0; i < WayItems.Count; i++)
             {
-                MakeWay(Points[i - 1], Points[i], i == 1);
-                RotationMove(i);
+                MakeWay(WayItems[i]);
+                RotationMove(i, WayItems);
             }
         }
 
-        private static void MakeWay(MyPoint p1, MyPoint p2, bool firstImg = false)
+        private static void MakeWay(WayItem wayItem)
         {
             decimal coef;
             decimal spLat;
             decimal spLong;
 
+            MyPoint p1 = new MyPoint(wayItem.lat1, wayItem.lon1, wayItem.h1);
+            MyPoint p2 = new MyPoint(wayItem.lat2, wayItem.lon2, wayItem.h2);
             Way way = new Way();
+
             MyPoint now = p1;
             decimal lenLat = p2.Latitude - now.Latitude;
             decimal lenLong = p2.Longitude - now.Longitude;
@@ -77,12 +97,12 @@
             Ways.Add(way);
         }
 
-        private static void RotationMove(int ind)
+        private static void RotationMove(int ind, List<WayItem> WayItems)
         {
-            if (ind + 1 != Points.Count)
+            if (ind + 1 != WayItems.Count)
             {
                 Way way = Ways.Last();
-                MyPoint nextPoint = Points[ind + 1];
+                MyPoint nextPoint = new MyPoint(WayItems[ind + 1].lat2, WayItems[ind + 1].lon2, WayItems[ind + 1].h2);
                 MyPoint curPoint = new MyPoint(way.Points.Last());
                 decimal lenLat = nextPoint.Latitude - curPoint.Latitude;
                 decimal lenLong = nextPoint.Longitude - curPoint.Longitude;
@@ -100,6 +120,7 @@
 
         public static void MakeImages()
         {
+            Directory.CreateDirectory(Path);
             int numOfImgs = 1;
             Bitmap temp;
 
@@ -119,9 +140,7 @@
             const string key = "AIzaSyBfmTeq_d7lCghqlL_kX29Qsr2vQIB0UdA";
             int zoom = 15;
 
-            string uri = $"https://maps.googleapis.com/maps/api/staticmap?center= {point.Latitude} {point.Longitude}&zoom={zoom}&size=640x640&maptype=satellite&key={key}&format=BMP";
-            WebClient webClient = new WebClient();
-            webClient.Headers.Add("User-Agent: Other");
+            string uri = $"https://maps.googleapis.com/maps/api/staticmap?center= {point.Latitude} {point.Longitude}&zoom={zoom}&size=1280x1280&maptype=satellite&key={key}&format=png&scale=2";
 
             Bitmap img = new Bitmap(new MemoryStream(webClient.DownloadData(uri)));
 
@@ -129,7 +148,6 @@
 
             //пока только поворот(и тот по ощущения не правильный)
             img = RotateImage(img, point.Yaw);
-            img.Save($"img2/{Guid.NewGuid()}.jpg");
 
             img = img.Clone(new Rectangle(img.Width / 2 - size / 2, img.Height / 2 - size / 2, size, size), img.PixelFormat);
 
@@ -165,7 +183,7 @@
         private static void SaveJPG(Bitmap bmp, string path)
         {
             EncoderParameters encoderParameters = new EncoderParameters(1);
-            encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 100L);
+            encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 100L);
             bmp.Save(path, ImageCodecInfo.GetImageEncoders().FirstOrDefault(x => x.FormatID == ImageFormat.Jpeg.Guid), encoderParameters);
         }
 
