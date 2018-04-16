@@ -119,7 +119,7 @@
             }
 
             float fl;
-            if (float.TryParse(TextBoxSpeed.Text, out fl))
+            if (float.TryParse(TextBoxSpeedW.Text, out fl))
             {
                 WayImager.SpeedW = fl;
             }

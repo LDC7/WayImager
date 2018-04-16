@@ -46,6 +46,7 @@
             }
 
             Uri uri = new Uri($"http://maps.googleapis.com/maps/api/staticmap?path=color:0xff0000|weight:5{sb.ToString()}&scale=2&format=png&size=1280x1280&maptype=satellite");
+            // Сохранение добавить
 
             return new BitmapImage(uri);
         }
@@ -109,6 +110,8 @@
                 Angle neededYaw = (float)(Math.Atan2((double)lenLat, (double)lenLong) * (180 / Math.PI)) - 90;
                 int temp = neededYaw - curPoint.Yaw > 180 ? -1 : 1;
 
+                // Поворот лишний (неполный)
+
                 while (Math.Abs(neededYaw - curPoint.Yaw) > SpeedW)
                 {
                     curPoint.Yaw += SpeedW * temp;
@@ -124,12 +127,21 @@
             int numOfImgs = 1;
             Bitmap temp;
 
+            //Нули добавляем для алгоритма Макса
+            int count = 0;
+            foreach (var w in Ways)
+            {
+                count += w.Points.Count;
+            }
+            
             foreach (var w in Ways)
             {
                 for (int i = 0; i < w.Points.Count; i++)
                 {
+                    string nameForImage = numOfImgs.ToString($"D{count.ToString().Length}");
+
                     temp = GetImage(w.Points[i]);
-                    SaveJPG(temp, $"{Path}/{numOfImgs}.jpg");
+                    SaveJPG(temp, $"{Path}/{nameForImage}.jpg");
                     numOfImgs++;
                 }
             }
@@ -184,6 +196,9 @@
         {
             EncoderParameters encoderParameters = new EncoderParameters(1);
             encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 100L);
+
+            // Добавить параметры изображения (высота и т.п.)
+
             bmp.Save(path, ImageCodecInfo.GetImageEncoders().FirstOrDefault(x => x.FormatID == ImageFormat.Jpeg.Guid), encoderParameters);
         }
 

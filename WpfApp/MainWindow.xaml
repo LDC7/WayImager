@@ -23,11 +23,11 @@
             </DataGrid.Columns>
         </DataGrid>
         <Button x:Name="ButtonExit" Content="Выход" HorizontalAlignment="Left" Margin="1010,670,0,0" VerticalAlignment="Top" Width="100" Click="ButtonExit_Click"/>
-        <TextBox x:Name="TextBoxSpeed" HorizontalAlignment="Left" Height="23" Margin="186,390,0,0" TextWrapping="Wrap" Text="120" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="TextBoxSpeed" HorizontalAlignment="Left" Height="23" Margin="186,390,0,0" TextWrapping="Wrap" Text="20" VerticalAlignment="Top" Width="120"/>
         <Label Content="Скорость:" HorizontalAlignment="Left" Margin="10,386,0,0" VerticalAlignment="Top"/>
         <Label Content="Скорость поворота:" HorizontalAlignment="Left" Margin="10,417,0,0" VerticalAlignment="Top"/>
         <Label Content="Скорость изменения высоты:" HorizontalAlignment="Left" Margin="10,448,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="TextBoxSpeedW" HorizontalAlignment="Left" Height="23" Margin="186,421,0,0" TextWrapping="Wrap" Text="20" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="TextBoxSpeedW" HorizontalAlignment="Left" Height="23" Margin="186,421,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="120"/>
         <TextBox x:Name="TextBoxSpeedH" HorizontalAlignment="Left" Height="23" Margin="186,452,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
         <Label Content="Примечание:" HorizontalAlignment="Left" Margin="10,584,0,0" VerticalAlignment="Top"/>
         <Label Content="30м/с = 0.0001 координат/с" HorizontalAlignment="Left" Margin="10,615,0,0" VerticalAlignment="Top"/>
