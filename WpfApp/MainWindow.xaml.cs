@@ -69,17 +69,17 @@
                     h2 = 0,
                     kr = 0, tn = 0,
                     dkr = 0, dtn = 0, dyw = 0 });
-            Data.Add(
-                new WayItem
-                {
-                    lat1 = 56.8699838m,
-                    lon1 = 53.2988932m,
-                    h1 = 0,
-                    lat2 = 56.8746803m,
-                    lon2 = 53.3047833m,
-                    h2 = 0,
-                    kr = 0, tn = 0,
-                    dkr = 0, dtn = 0, dyw = 0 });
+            //Data.Add(
+            //    new WayItem
+            //    {
+            //        lat1 = 56.8699838m,
+            //        lon1 = 53.2988932m,
+            //        h1 = 0,
+            //        lat2 = 56.8746803m,
+            //        lon2 = 53.3047833m,
+            //        h2 = 0,
+            //        kr = 0, tn = 0,
+            //        dkr = 0, dtn = 0, dyw = 0 });
         }
 
         private void ButtonFolder_Click(object sender, RoutedEventArgs e)
