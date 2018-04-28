@@ -42,12 +42,11 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Angle.cs" />
     <Compile Include="MyPoint.cs" />
-    <Compile Include="WayItem.cs" />
-    <Compile Include="Way.cs" />
     <Compile Include="WayImager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

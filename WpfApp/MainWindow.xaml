@@ -5,37 +5,32 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="744.253" Width="1137.835">
+        Title="MainWindow" Height="719.253" Width="1039.835">
     <Grid>
-        <DataGrid x:Name="MainDataGrid" HorizontalAlignment="Left" Height="371" Margin="10,10,0,0" VerticalAlignment="Top" Width="1108" FontFamily="Times New Roman" CanUserAddRows="True" SelectionMode="Single" SelectionUnit="Cell" AutoGenerateColumns="False">
+        <DataGrid x:Name="MainDataGrid" HorizontalAlignment="Left" Height="371" Margin="10,10,0,0" VerticalAlignment="Top" Width="296" FontFamily="Times New Roman" CanUserAddRows="True" AutoGenerateColumns="False" SelectionMode="Single">
             <DataGrid.Columns>
-                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Path=lat1}" Header="Широта 1" Width="100" />
-                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Path=lon1}" Header="Долгота 1" Width="100" />
-                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Path=h1}" Header="Высота 1" Width="100" />
-                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Path=lat2}" Header="Широта 2" Width="100" />
-                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Path=lon2}" Header="Долгота 2" Width="100" />
-                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Path=h2}" Header="Высота 2" Width="100" />
-                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Path=kr}" Header="Крен" Width="100" />
-                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Path=tn}" Header="Тангаж" Width="100" />
-                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Path=dkr}" Header="dКрен" Width="100" />
-                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Path=dtn}" Header="dТангаж" Width="100" />
-                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Path=dyw}" Header="dРаскание" Width="100" />
+                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Path=Latitude}" Header="Широта" Width="100" />
+                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Path=Longitude}" Header="Долгота" Width="100" />
+                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Path=H}" Header="Высота" Width="100" />
             </DataGrid.Columns>
         </DataGrid>
-        <Button x:Name="ButtonExit" Content="Выход" HorizontalAlignment="Left" Margin="1010,670,0,0" VerticalAlignment="Top" Width="100" Click="ButtonExit_Click"/>
+        <Button x:Name="ButtonExit" Content="Выход" HorizontalAlignment="Left" Margin="916,657,0,0" VerticalAlignment="Top" Width="100" Click="ButtonExit_Click"/>
         <TextBox x:Name="TextBoxSpeed" HorizontalAlignment="Left" Height="23" Margin="186,390,0,0" TextWrapping="Wrap" Text="20" VerticalAlignment="Top" Width="120"/>
         <Label Content="Скорость:" HorizontalAlignment="Left" Margin="10,386,0,0" VerticalAlignment="Top"/>
         <Label Content="Скорость поворота:" HorizontalAlignment="Left" Margin="10,417,0,0" VerticalAlignment="Top"/>
         <Label Content="Скорость изменения высоты:" HorizontalAlignment="Left" Margin="10,448,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="TextBoxSpeedW" HorizontalAlignment="Left" Height="23" Margin="186,421,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="120"/>
         <TextBox x:Name="TextBoxSpeedH" HorizontalAlignment="Left" Height="23" Margin="186,452,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
-        <Label Content="Примечание:" HorizontalAlignment="Left" Margin="10,584,0,0" VerticalAlignment="Top"/>
-        <Label Content="30м/с = 0.0001 координат/с" HorizontalAlignment="Left" Margin="10,615,0,0" VerticalAlignment="Top"/>
-        <Label Content="Высота, крен и тангаж не работают" HorizontalAlignment="Left" Margin="10,646,0,0" VerticalAlignment="Top"/>
-        <Image x:Name="ImageBox" HorizontalAlignment="Left" Height="300" Margin="705,386,0,0" VerticalAlignment="Top" Width="300"/>
-        <Button x:Name="ButtonExecute" Content="Выполнить" HorizontalAlignment="Left" Margin="1010,393,0,0" VerticalAlignment="Top" Width="100" Click="ButtonExecute_Click"/>
-        <Label Content="dКрен, dТангаж, dРыскние - случайные изменения(не работают)" HorizontalAlignment="Left" Margin="10,677,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="TextBoxPath" HorizontalAlignment="Left" Height="23" Margin="10,479,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="525" IsEnabled="False"/>
-        <Button x:Name="ButtonFolder" Content="Выбрать папку" HorizontalAlignment="Left" Margin="540,479,0,0" VerticalAlignment="Top" Width="100" Click="ButtonFolder_Click"/>
+        <Label Content="Примечание:" HorizontalAlignment="Left" Margin="10,558,0,0" VerticalAlignment="Top"/>
+        <Label Content="30м/с = 0.0001 координат/с" HorizontalAlignment="Left" Margin="10,589,0,0" VerticalAlignment="Top"/>
+        <Label Content="Высота, крен и тангаж не работают" HorizontalAlignment="Left" Margin="10,620,0,0" VerticalAlignment="Top"/>
+        <Image x:Name="ImageBox" HorizontalAlignment="Left" Height="500" Margin="311,10,0,0" VerticalAlignment="Top" Width="500"/>
+        <Button x:Name="ButtonCreateImg" Content="Сформировать изображения" HorizontalAlignment="Left" Margin="816,61,0,0" VerticalAlignment="Top" Width="200" Click="ButtonCreateImg_Click" IsEnabled="False"/>
+        <Label Content="dКрен, dТангаж, dРыскние - случайные изменения(не работают)" HorizontalAlignment="Left" Margin="10,651,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="TextBoxPath" HorizontalAlignment="Left" Height="70" Margin="10,479,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="296" IsEnabled="False"/>
+        <Button x:Name="ButtonFolder" Content="Выбрать папку" HorizontalAlignment="Left" Margin="311,529,0,0" VerticalAlignment="Top" Width="100" Click="ButtonFolder_Click"/>
+        <Button x:Name="ButtonOpenPoints" Content="Список точек" HorizontalAlignment="Left" Margin="816,36,0,0" VerticalAlignment="Top" Width="200" Click="ButtonOpenPoints_Click" IsEnabled="False"/>
+        <Button x:Name="ButtonCreatePoints" Content="Сформировать точки" HorizontalAlignment="Left" Margin="816,11,0,0" VerticalAlignment="Top" Width="200" Click="ButtonCreatePoints_Click"/>
+        <ProgressBar x:Name="MainProgressBar" HorizontalAlignment="Left" Height="26" Margin="311,558,0,0" VerticalAlignment="Top" Width="705" IsIndeterminate="True"/>
     </Grid>
 </Window>

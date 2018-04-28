@@ -14,7 +14,7 @@
 
     public abstract class WayImager
     {
-        public static List<Way> Ways { get; }
+        public static List<MyPoint> Ways { get; }
         public static decimal Speed { get; set; }
         public static string Path { get; set; }
         public static float SpeedW { get; set; }
@@ -22,27 +22,26 @@
 
         private static WebClient webClient;
 
-        const int size = 900;
+        const int sizeW = 900;
+        const int sizeH = 900;
 
         static WayImager()
         {
             webClient = new WebClient();
             webClient.Headers.Add("User-Agent: Other");
-            Ways = new List<Way>();
+            Ways = new List<MyPoint>();
             Speed = 0.0003m;
             SpeedW = 20;
             Path = "img";
         }
 
-        public static ImageSource CreatePreview(List<WayItem> WayItems)
+        public static ImageSource CreatePreview(List<MyPoint> WayItems)
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendFormat("|{0:f6},{1:f6}", WayItems[0].lat1, WayItems[0].lon1);
-
-            for (int i = 0; i < WayItems.Count; i++)
+            foreach (var p in WayItems)
             {
-                sb.AppendFormat("|{0:f6},{1:f6}", WayItems[i].lat2, WayItems[i].lon2);
+                sb.AppendFormat("|{0:f6},{1:f6}", p.Latitude, p.Longitude);
             }
 
             Uri uri = new Uri($"http://maps.googleapis.com/maps/api/staticmap?path=color:0xff0000|weight:5{sb.ToString()}&scale=2&format=png&size=1280x1280&maptype=satellite");
@@ -51,74 +50,77 @@
             return new BitmapImage(uri);
         }
 
-        public static void MakeWays(List<WayItem> WayItems)
+        public static void MakeWays(List<MyPoint> WayItems)
         {
             Ways.Clear();
+            bool firstFlag = true;
 
-            for (int i = 0; i < WayItems.Count; i++)
+            for (int i = 1; i < WayItems.Count; i++)
             {
-                MakeWay(WayItems[i]);
-                RotationMove(i, WayItems);
+                MakeWay(WayItems[i - 1], WayItems[i], firstFlag);
+                firstFlag = false;
             }
         }
 
-        private static void MakeWay(WayItem wayItem)
+        private static void MakeWay(MyPoint startPoint, MyPoint endPoint, bool firstFlag = false)
         {
-            decimal coef;
             decimal spLat;
             decimal spLong;
+            int rotation;
 
-            MyPoint p1 = new MyPoint(wayItem.lat1, wayItem.lon1, wayItem.h1);
-            MyPoint p2 = new MyPoint(wayItem.lat2, wayItem.lon2, wayItem.h2);
-            Way way = new Way();
+            MyPoint now = startPoint;
+            MyPoint p2 = endPoint;
 
-            MyPoint now = p1;
             decimal lenLat = p2.Latitude - now.Latitude;
             decimal lenLong = p2.Longitude - now.Longitude;
             decimal len = decimal.Round((decimal)Math.Sqrt((double)(lenLat * lenLat + lenLong * lenLong)), 7);
+            Angle neededYaw = (float)(Math.Atan2((double)lenLat, (double)lenLong) * (180 / Math.PI)) - 90;
 
-            now.Yaw = (float)(Math.Atan2((double)lenLat, (double)lenLong) * (180 / Math.PI)) - 90;
-            way.Points.Add(now);
+            if (firstFlag)
+            {
+                now.Yaw = (float)(Math.Atan2((double)lenLat, (double)lenLong) * (180 / Math.PI)) - 90;
+                Ways.Add(now);
+            }
+            else
+            {
+                now.Yaw = Ways.Last().Yaw;
+            }            
 
             while (len > Speed)
             {
-                coef = Speed / len;
-                spLat = coef * lenLat;
-                spLong = coef * lenLong;
-                now = new MyPoint(now.Latitude + spLat, now.Longitude + spLong, now.H);
+                spLat = (decimal)Math.Sin(new Angle(90 - now.Yaw).ToRad()) * Speed * (lenLat < 0 ? 1 : -1);
+                spLong  = (decimal)Math.Sin((new Angle(now.Yaw)).ToRad()) * Speed * (lenLong < 0 ? -1 : 1);
+                now = new MyPoint(now);
+                now.Latitude += spLat;
+                now.Longitude += spLong;
 
-                now.Yaw = (float)(Math.Atan2((double)lenLat, (double)lenLong) * (180 / Math.PI)) - 90;
-                way.Points.Add(now);
+                if (Math.Abs(now.Yaw - neededYaw) > SpeedW)
+                {
+                    rotation = neededYaw - now.Yaw < 180 ? 1 : -1;
+                    now.Yaw += SpeedW * rotation;
+                }
+                else
+                {
+                    now.Yaw = neededYaw;
+                }
+
+                Ways.Add(now);
 
                 lenLat = p2.Latitude - now.Latitude;
                 lenLong = p2.Longitude - now.Longitude;
                 len = decimal.Round((decimal)Math.Sqrt((double)(lenLat * lenLat + lenLong * lenLong)), 7);
-            }
+                neededYaw = (float)(Math.Atan2((double)lenLat, (double)lenLong) * (180 / Math.PI)) - 90;
 
-            Ways.Add(way);
-        }
-
-        private static void RotationMove(int ind, List<WayItem> WayItems)
-        {
-            if (ind + 1 != WayItems.Count)
-            {
-                Way way = Ways.Last();
-                MyPoint nextPoint = new MyPoint(WayItems[ind + 1].lat2, WayItems[ind + 1].lon2, WayItems[ind + 1].h2);
-                MyPoint curPoint = new MyPoint(way.Points.Last());
-                decimal lenLat = nextPoint.Latitude - curPoint.Latitude;
-                decimal lenLong = nextPoint.Longitude - curPoint.Longitude;
-                Angle neededYaw = (float)(Math.Atan2((double)lenLat, (double)lenLong) * (180 / Math.PI)) - 90;
-                int temp = neededYaw - curPoint.Yaw > 180 ? -1 : 1;
-
-                // Поворот лишний (неполный)
-
-                while (Math.Abs(neededYaw - curPoint.Yaw) > SpeedW)
+                if (Ways.Count > 500)
                 {
-                    curPoint.Yaw += SpeedW * temp;
-                    way.Points.Add(curPoint);
-                    curPoint = new MyPoint(curPoint);
+                    break;
                 }
             }
+
+            now = new MyPoint(now);
+            now.Latitude = endPoint.Latitude;
+            now.Longitude = endPoint.Longitude;
+            Ways.Add(now);
         }
 
         public static void MakeImages()
@@ -128,22 +130,15 @@
             Bitmap temp;
 
             //Нули добавляем для алгоритма Макса
-            int count = 0;
-            foreach (var w in Ways)
-            {
-                count += w.Points.Count;
-            }
-            
-            foreach (var w in Ways)
-            {
-                for (int i = 0; i < w.Points.Count; i++)
-                {
-                    string nameForImage = numOfImgs.ToString($"D{count.ToString().Length}");
+            int count = Ways.Count;
 
-                    temp = GetImage(w.Points[i]);
-                    SaveJPG(temp, $"{Path}/{nameForImage}.jpg");
-                    numOfImgs++;
-                }
+            foreach (var p in Ways)
+            {
+                string nameForImage = numOfImgs.ToString($"D{count.ToString().Length}");
+
+                temp = GetImage(p);
+                SaveJPG(temp, $"{Path}/{nameForImage}.jpg");
+                numOfImgs++;
             }
         }
 
@@ -161,7 +156,7 @@
             //пока только поворот(и тот по ощущения не правильный)
             img = RotateImage(img, point.Yaw);
 
-            img = img.Clone(new Rectangle(img.Width / 2 - size / 2, img.Height / 2 - size / 2, size, size), img.PixelFormat);
+            img = img.Clone(new Rectangle(img.Width / 2 - sizeW / 2, img.Height / 2 - sizeH / 2, sizeW, sizeH), img.PixelFormat);
 
             //установка широты и долготы
             tempProp.Len = 8;

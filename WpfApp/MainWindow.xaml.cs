@@ -3,83 +3,69 @@
     using System;
     using System.Collections.Generic;
     using System.Reflection;
+    using System.Security.Permissions;
+    using System.Threading;
     using System.Windows;
     using System.Windows.Forms;
     using WayImages;
 
-    /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
-        public List<WayItem> Data { get; set; }
+        public List<MyPoint> Data { get; set; }
 
         public MainWindow()
         {
-            Data = new List<WayItem>();
+            Data = new List<MyPoint>();
             InitializeComponent();
             MainDataGrid.ItemsSource = Data;
             TextBoxPath.Text = $"{Assembly.GetExecutingAssembly().Location}/{WayImager.Path}";
             InitTestData();
+            MainProgressBar.IsIndeterminate = false;
         }
 
+        [SecurityPermissionAttribute(SecurityAction.Demand, ControlThread = true)]
         private void ButtonExit_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
 
-        private void ButtonExecute_Click(object sender, RoutedEventArgs e)
+        private void ButtonCreateImg_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                ValidateData();
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show(ex.Message, "ALERT", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
-            ImageBox.Source = WayImager.CreatePreview(Data);
-            WayImager.MakeWays(Data);
+            MainProgressBar.IsIndeterminate = true;
             WayImager.MakeImages();
+            MainProgressBar.IsIndeterminate = false; //надо запихнуть в ивенты
         }
 
         private void InitTestData()
         {
             Data.Add(
-                new WayItem
+                new MyPoint
                 {
-                    lat1 = 56.8746803m,
-                    lon1 = 53.3047833m,
-                    h1 = 0,
-                    lat2 = 56.8745807m,
-                    lon2 = 53.2929387m,
-                    h2 = 0,
-                    kr = 0,  tn = 0,
-                    dkr = 0, dtn = 0, dyw = 0 });
+                    Latitude = 56.8746803m,
+                    Longitude = 53.3047833m,
+                    H = 0
+                });
             Data.Add(
-                new WayItem
+                new MyPoint
                 {
-                    lat1 = 56.8745807m,
-                    lon1 = 53.2929387m,
-                    h1 = 0,
-                    lat2 = 56.8699838m,
-                    lon2 = 53.2988932m,
-                    h2 = 0,
-                    kr = 0, tn = 0,
-                    dkr = 0, dtn = 0, dyw = 0 });
+                    Latitude = 56.8745807m,
+                    Longitude = 53.2929387m,
+                    H = 0
+                });
             Data.Add(
-                new WayItem
+                new MyPoint
                 {
-                    lat1 = 56.8699838m,
-                    lon1 = 53.2988932m,
-                    h1 = 0,
-                    lat2 = 56.8746803m,
-                    lon2 = 53.3047833m,
-                    h2 = 0,
-                    kr = 0, tn = 0,
-                    dkr = 0, dtn = 0, dyw = 0 });
+                    Latitude = 56.8699838m,
+                    Longitude = 53.2988932m,
+                    H = 0
+                });
+            Data.Add(
+                new MyPoint
+                {
+                    Latitude = 56.8746803m,
+                    Longitude = 53.3047833m,
+                    H = 0
+                });
         }
 
         private void ButtonFolder_Click(object sender, RoutedEventArgs e)
@@ -95,17 +81,9 @@
 
         private void ValidateData()
         {
-            if (Data.Count == 0)
+            if (Data.Count < 2)
             {
-                throw new ArgumentException("Empty data!");
-            }
-
-            for (int i = 1; i < Data.Count; i++)
-            {
-                if (Data[i].lat1 != Data[i-1].lat2 || Data[i].lon1 != Data[i - 1].lon2 || Data[i].h1 != Data[i - 1].h2)
-                {
-                    throw new Exception($"Line {i + 1}: Start point shuold coincide with the end point of the previous path.");
-                }
+                throw new ArgumentException("Not enought data!");
             }
 
             int integ;
@@ -141,6 +119,34 @@
         private decimal msToCor(int ms)
         {
             return ms * 0.0001m / 30;
+        }
+
+        private void ButtonOpenPoints_Click(object sender, RoutedEventArgs e)
+        {
+            PointsListWindow window = new PointsListWindow(WayImager.Ways);
+            window.Show();
+        }
+
+        private void ButtonCreatePoints_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ValidateData();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "ALERT", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            MainProgressBar.IsIndeterminate = true;
+            ImageBox.Source = WayImager.CreatePreview(Data);
+
+            WayImager.MakeWays(Data);
+
+            ButtonOpenPoints.IsEnabled = true;
+            ButtonCreateImg.IsEnabled = true;
+            MainProgressBar.IsIndeterminate = false;
         }
     }
 }

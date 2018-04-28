@@ -1,5 +1,7 @@
 ﻿namespace WayImages
 {
+    using System;
+
     public class Angle
     {
         private float angle;
@@ -18,7 +20,7 @@
             set
             {
                 angle = value;
-                while (angle > 360)
+                while (angle >= 360)
                 {
                     angle -= 360;
                 }
@@ -38,6 +40,11 @@
         public static implicit operator Angle(float a)
         {
             return new Angle(a);
+        }
+
+        public double ToRad()
+        {
+            return (double)(((decimal)Math.PI) * (decimal)angle / 180);
         }
     }
 }

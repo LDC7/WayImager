@@ -1,0 +1,22 @@
+﻿<Window x:Class="WpfApp.PointsListWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp"
+        mc:Ignorable="d"
+        Title="PointsListWindow" Height="569.253" Width="652.835">
+    <Grid>
+        <DataGrid x:Name="PointsDataGrid" HorizontalAlignment="Left" Height="493" Margin="10,10,0,0" VerticalAlignment="Top" Width="625" FontFamily="Times New Roman" CanUserAddRows="True" AutoGenerateColumns="False" SelectionMode="Single">
+            <DataGrid.Columns>
+                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Path=Latitude}" Header="Широта" Width="100" />
+                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Path=Longitude}" Header="Долгота" Width="100" />
+                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Path=H}" Header="Высота" Width="100" />
+                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Path=Kren}" Header="Крен" Width="100" />
+                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Path=Ten}" Header="Тангаж" Width="100" />
+                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Path=Yaw}" Header="Рыскание" Width="100" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button x:Name="ButtonExit" Content="Выход" HorizontalAlignment="Left" Margin="535,508,0,0" VerticalAlignment="Top" Width="100" Click="ButtonExit_Click"/>
+    </Grid>
+</Window>
