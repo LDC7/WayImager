@@ -13,6 +13,7 @@
             Data = data;
             InitializeComponent();
             PointsDataGrid.ItemsSource = Data;
+            CountLabel.Content = $"Количество точек: {Data.Count}";
         }
 
         private void ButtonExit_Click(object sender, RoutedEventArgs e)

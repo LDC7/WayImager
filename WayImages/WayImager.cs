@@ -88,8 +88,8 @@
 
             while (len > Speed)
             {
-                spLat = (decimal)Math.Sin(new Angle(90 - now.Yaw).ToRad()) * Speed * (lenLat < 0 ? 1 : -1);
-                spLong  = (decimal)Math.Sin((new Angle(now.Yaw)).ToRad()) * Speed * (lenLong < 0 ? -1 : 1);
+                spLat = (decimal)Math.Cos((new Angle(now.Yaw)).ToRad()) * Speed;// * (Math.Sin((new Angle(now.Yaw)).ToRad()) < 0 ? 1 : -1);
+                spLong = (decimal)Math.Cos((new Angle(90 + now.Yaw)).ToRad()) * Speed;// * (Math.Cos((new Angle(now.Yaw)).ToRad()) < 0 ? -1 : 1);
                 now = new MyPoint(now);
                 now.Latitude += spLat;
                 now.Longitude += spLong;

@@ -18,5 +18,6 @@
             </DataGrid.Columns>
         </DataGrid>
         <Button x:Name="ButtonExit" Content="Выход" HorizontalAlignment="Left" Margin="535,508,0,0" VerticalAlignment="Top" Width="100" Click="ButtonExit_Click"/>
+        <Label x:Name="CountLabel" Content="" HorizontalAlignment="Left" Margin="10,508,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>

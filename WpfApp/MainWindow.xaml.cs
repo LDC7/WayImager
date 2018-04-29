@@ -22,8 +22,7 @@
             InitTestData();
             MainProgressBar.IsIndeterminate = false;
         }
-
-        [SecurityPermissionAttribute(SecurityAction.Demand, ControlThread = true)]
+        
         private void ButtonExit_Click(object sender, RoutedEventArgs e)
         {
             Close();
@@ -43,6 +42,13 @@
                 {
                     Latitude = 56.8746803m,
                     Longitude = 53.3047833m,
+                    H = 0
+                });
+            Data.Add(
+                new MyPoint
+                {
+                    Latitude = 56.8806803m,
+                    Longitude = 53.2988932m,
                     H = 0
                 });
             Data.Add(
@@ -147,6 +153,12 @@
             ButtonOpenPoints.IsEnabled = true;
             ButtonCreateImg.IsEnabled = true;
             MainProgressBar.IsIndeterminate = false;
+        }
+
+        private void ButtonOpenMap_Click(object sender, RoutedEventArgs e)
+        {
+            MapWindow window = new MapWindow(WayImager.Ways);
+            window.Show();
         }
     }
 }

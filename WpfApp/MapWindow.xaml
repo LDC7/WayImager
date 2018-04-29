@@ -1,0 +1,14 @@
+﻿<Window x:Class="WpfApp.MapWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp"
+        mc:Ignorable="d"
+        Title="MapWindow" Height="569.253" Width="652.835">
+    <Grid>
+        <Button x:Name="ButtonExit" Content="Выход" HorizontalAlignment="Left" Margin="535,508,0,0" VerticalAlignment="Top" Width="100" Click="ButtonExit_Click"/>
+        <WebBrowser x:Name="Browser" HorizontalAlignment="Left" Height="493" Margin="10,10,0,0" VerticalAlignment="Top" Width="625"/>
+        <Button x:Name="ButtonOK" Content="OK" HorizontalAlignment="Left" Margin="430,508,0,0" VerticalAlignment="Top" Width="100" Click="ButtonOK_Click"/>
+    </Grid>
+</Window>
