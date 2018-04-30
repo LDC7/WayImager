@@ -39,7 +39,7 @@
             worker.WorkerSupportsCancellation = true;
             worker.WorkerReportsProgress = true;
             MainProgressBar.Value = 1;
-            MainProgressBar.Maximum = WayImager.Ways.Count;
+            MainProgressBar.Maximum = 101;
             MainDataGrid.IsEnabled = false;
             ButtonOpenMap.IsEnabled = false;
             ButtonCreatePoints.IsEnabled = false;

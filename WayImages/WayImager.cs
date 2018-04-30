@@ -147,7 +147,7 @@
                 SaveJPG(temp, $"{Path}/{nameForImage}.jpg");
                 bw.ReportProgress(100 * numOfImgs / count);
                 numOfImgs++;
-                
+
                 if (bw.CancellationPending)
                 {
                     return;
