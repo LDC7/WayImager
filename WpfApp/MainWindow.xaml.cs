@@ -2,9 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Reflection;
-    using System.Security.Permissions;
-    using System.Threading;
     using System.Windows;
     using System.Windows.Forms;
     using WayImages;
@@ -12,27 +11,54 @@
     public partial class MainWindow : Window
     {
         public List<MyPoint> Data { get; set; }
+        private BackgroundWorker worker;
 
         public MainWindow()
         {
-            Data = new List<MyPoint>();
+            worker = new BackgroundWorker();
             InitializeComponent();
+            Data = new List<MyPoint>();
             MainDataGrid.ItemsSource = Data;
             TextBoxPath.Text = $"{Assembly.GetExecutingAssembly().Location}/{WayImager.Path}";
             InitTestData();
             MainProgressBar.IsIndeterminate = false;
         }
-        
+
         private void ButtonExit_Click(object sender, RoutedEventArgs e)
         {
+            if (worker.IsBusy)
+            {
+                worker.CancelAsync();
+            }
             Close();
         }
 
         private void ButtonCreateImg_Click(object sender, RoutedEventArgs e)
         {
+            worker = new BackgroundWorker();
+            worker.WorkerSupportsCancellation = true;
             MainProgressBar.IsIndeterminate = true;
-            WayImager.MakeImages();
-            MainProgressBar.IsIndeterminate = false; //надо запихнуть в ивенты
+            MainDataGrid.IsEnabled = false;
+            ButtonOpenMap.IsEnabled = false;
+            ButtonCreatePoints.IsEnabled = false;
+            ButtonOpenPoints.IsEnabled = false;
+            ButtonCreateImg.IsEnabled = false;
+            ButtonFolder.IsEnabled = false;
+            worker.DoWork += delegate
+            {
+                WayImager.MakeImages(worker);
+            };
+            worker.RunWorkerCompleted += delegate
+            {
+                MainDataGrid.IsEnabled = true;
+                ButtonOpenMap.IsEnabled = true;
+                ButtonCreatePoints.IsEnabled = true;
+                ButtonOpenPoints.IsEnabled = true;
+                ButtonCreateImg.IsEnabled = true;
+                ButtonFolder.IsEnabled = true;
+                MainProgressBar.IsIndeterminate = false;
+            };
+            worker.RunWorkerAsync();
         }
 
         private void InitTestData()
@@ -145,14 +171,28 @@
                 return;
             }
 
+            worker = new BackgroundWorker();
+            worker.WorkerSupportsCancellation = true;
             MainProgressBar.IsIndeterminate = true;
-            ImageBox.Source = WayImager.CreatePreview(Data);
-
-            WayImager.MakeWays(Data);
-
-            ButtonOpenPoints.IsEnabled = true;
-            ButtonCreateImg.IsEnabled = true;
-            MainProgressBar.IsIndeterminate = false;
+            ButtonOpenMap.IsEnabled = false;
+            ButtonCreatePoints.IsEnabled = false;
+            ButtonOpenPoints.IsEnabled = false;
+            ButtonCreateImg.IsEnabled = false;
+            WayImager.Data = new List<MyPoint>(Data);
+            worker.DoWork += delegate
+            {
+                WayImager.MakeWays(worker);
+            };
+            worker.RunWorkerCompleted += delegate
+            {
+                ImageBox.Source = WayImager.CreatePreview(Data);
+                ButtonOpenMap.IsEnabled = true;
+                ButtonCreatePoints.IsEnabled = true;
+                ButtonOpenPoints.IsEnabled = true;
+                ButtonCreateImg.IsEnabled = true;
+                MainProgressBar.IsIndeterminate = false;
+            };
+            worker.RunWorkerAsync();
         }
 
         private void ButtonOpenMap_Click(object sender, RoutedEventArgs e)
