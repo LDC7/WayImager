@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Drawing;
     using System.Drawing.Drawing2D;
     using System.Drawing.Imaging;
@@ -14,6 +15,7 @@
 
     public abstract class WayImager
     {
+        public static List<MyPoint> Data { get; set; }
         public static List<MyPoint> Ways { get; }
         public static decimal Speed { get; set; }
         public static string Path { get; set; }
@@ -50,15 +52,20 @@
             return new BitmapImage(uri);
         }
 
-        public static void MakeWays(List<MyPoint> WayItems)
+        public static void MakeWays(BackgroundWorker bw)
         {
             Ways.Clear();
             bool firstFlag = true;
 
-            for (int i = 1; i < WayItems.Count; i++)
+            for (int i = 1; i < Data.Count; i++)
             {
-                MakeWay(WayItems[i - 1], WayItems[i], firstFlag);
+                MakeWay(Data[i - 1], Data[i], firstFlag);
                 firstFlag = false;
+
+                if (bw.CancellationPending)
+                {
+                    return;
+                }
             }
         }
 
@@ -123,7 +130,7 @@
             Ways.Add(now);
         }
 
-        public static void MakeImages()
+        public static void MakeImages(BackgroundWorker bw)
         {
             Directory.CreateDirectory(Path);
             int numOfImgs = 1;
@@ -138,7 +145,13 @@
 
                 temp = GetImage(p);
                 SaveJPG(temp, $"{Path}/{nameForImage}.jpg");
+                bw.ReportProgress(100 * numOfImgs / count);
                 numOfImgs++;
+                
+                if (bw.CancellationPending)
+                {
+                    return;
+                }
             }
         }
 
