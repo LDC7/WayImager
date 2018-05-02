@@ -26,6 +26,10 @@
 
             //распарсить Browser.Source
 
+            //ссылки:
+            // https://habr.com/post/110460/
+            // https://habr.com/post/324880/
+
             Close();
         }
     }

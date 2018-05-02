@@ -95,11 +95,7 @@
 
             while (len > Speed)
             {
-                spLat = (decimal)Math.Cos((new Angle(now.Yaw)).ToRad()) * Speed;// * (Math.Sin((new Angle(now.Yaw)).ToRad()) < 0 ? 1 : -1);
-                spLong = (decimal)Math.Cos((new Angle(90 + now.Yaw)).ToRad()) * Speed;// * (Math.Cos((new Angle(now.Yaw)).ToRad()) < 0 ? -1 : 1);
                 now = new MyPoint(now);
-                now.Latitude += spLat;
-                now.Longitude += spLong;
 
                 if (Math.Abs(now.Yaw - neededYaw) > SpeedW)
                 {
@@ -111,17 +107,17 @@
                     now.Yaw = neededYaw;
                 }
 
+                spLat = (decimal)Math.Cos((new Angle(now.Yaw)).ToRad()) * Speed;
+                spLong = (decimal)Math.Cos((new Angle(90 + now.Yaw)).ToRad()) * Speed;                
+                now.Latitude += spLat;
+                now.Longitude += spLong;
+
                 Ways.Add(now);
 
                 lenLat = p2.Latitude - now.Latitude;
                 lenLong = p2.Longitude - now.Longitude;
                 len = decimal.Round((decimal)Math.Sqrt((double)(lenLat * lenLat + lenLong * lenLong)), 7);
                 neededYaw = (float)(Math.Atan2((double)lenLat, (double)lenLong) * (180 / Math.PI)) - 90;
-
-                if (Ways.Count > 500)
-                {
-                    break;
-                }
             }
 
             now = new MyPoint(now);
