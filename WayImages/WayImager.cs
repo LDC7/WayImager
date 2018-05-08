@@ -200,35 +200,44 @@
             /// ПАРАМЕТРЫ ИЗОБРАЖЕНИЯ
 
             // Декодер нужно передавать в эту функцию - то есть переписать Bitmap на BitmapDecoder
-            BitmapDecoder decoder = JpegBitmapDecoder.Create(new Uri($"https://maps.googleapis.com/maps/api/staticmap?center=56.8746803 53.3047833&zoom=15&size=1280x1280&maptype=satellite&key=AIzaSyBfmTeq_d7lCghqlL_kX29Qsr2vQIB0UdA&format=png&scale=2"), BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.Default);
+            BitmapDecoder decoder;
 
-            // Формируем параметры изображения (высота и т.п.)
-            BitmapMetadata TmpImgEXIF = new BitmapMetadata("jpg");
-
-            TmpImgEXIF.SetQuery("/app1/ifd/gps/{ushort=1}", "N");             //широта
-            TmpImgEXIF.SetQuery("/app1/ifd/gps/{ushort=3}", "E");             //долгота
-            TmpImgEXIF.SetQuery("/app1/ifd/gps/{ushort=0}", "2.2.0.0");            //версия
-            TmpImgEXIF.SetQuery("/app1/ifd/gps/{ushort=2}", rational(95.3));            //высота - ее в другой параметр потом
-
-            //Запись широты
-            ulong[] latitude = getCoordWithDegMinSec((double)point.Latitude);
-            TmpImgEXIF.SetQuery("/app1/ifd/gps/{ushort=2}", latitude);
-
-            //Запись долготы
-            ulong[] longitude = getCoordWithDegMinSec((double)point.Longitude);
-            TmpImgEXIF.SetQuery("/app1/ifd/gps/{ushort=4}", longitude);
-
-            //создадим новый файл снимка, в который перенесем все, кроме метаданных, из первого файла, 
-            //а метаданные возьмем те, которые мы изменили.
-            JpegBitmapEncoder Encoder = new JpegBitmapEncoder();//создали новый энкодер для Jpeg
-
-            Encoder.Frames.Add(BitmapFrame.Create(decoder.Frames[0], decoder.Frames[0].Thumbnail, TmpImgEXIF, decoder.Frames[0].ColorContexts)); //добавили в энкодер новый кадр(он там всего один) с указанными параметрами
-
-            using (Stream jpegStreamOut = File.Open(path, FileMode.Create, FileAccess.ReadWrite))//создали новый файл
+            using (MemoryStream s = new MemoryStream())
             {
-                Encoder.Save(jpegStreamOut);//сохранили новый файл
-            }
+                bmp.Save(s, ImageFormat.Png);
 
+
+                //BitmapDecoder decoder = JpegBitmapDecoder.Create(new Uri($"https://maps.googleapis.com/maps/api/staticmap?center=56.8746803 53.3047833&zoom=15&size=1280x1280&maptype=satellite&key=AIzaSyBfmTeq_d7lCghqlL_kX29Qsr2vQIB0UdA&format=png&scale=2"), BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.Default);
+                decoder = JpegBitmapDecoder.Create(s, BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.Default);
+
+
+                // Формируем параметры изображения (высота и т.п.)
+                BitmapMetadata TmpImgEXIF = new BitmapMetadata("jpg");
+
+                TmpImgEXIF.SetQuery("/app1/ifd/gps/{ushort=1}", "N");             //широта
+                TmpImgEXIF.SetQuery("/app1/ifd/gps/{ushort=3}", "E");             //долгота
+                TmpImgEXIF.SetQuery("/app1/ifd/gps/{ushort=0}", "2.2.0.0");            //версия
+                TmpImgEXIF.SetQuery("/app1/ifd/gps/{ushort=2}", rational(95.3));            //высота - ее в другой параметр потом
+
+                //Запись широты
+                ulong[] latitude = getCoordWithDegMinSec((double)point.Latitude);
+                TmpImgEXIF.SetQuery("/app1/ifd/gps/{ushort=2}", latitude);
+
+                //Запись долготы
+                ulong[] longitude = getCoordWithDegMinSec((double)point.Longitude);
+                TmpImgEXIF.SetQuery("/app1/ifd/gps/{ushort=4}", longitude);
+
+                //создадим новый файл снимка, в который перенесем все, кроме метаданных, из первого файла, 
+                //а метаданные возьмем те, которые мы изменили.
+                JpegBitmapEncoder Encoder = new JpegBitmapEncoder();//создали новый энкодер для Jpeg
+
+                Encoder.Frames.Add(BitmapFrame.Create(decoder.Frames[0], decoder.Frames[0].Thumbnail, TmpImgEXIF, decoder.Frames[0].ColorContexts)); //добавили в энкодер новый кадр(он там всего один) с указанными параметрами
+
+                using (Stream jpegStreamOut = File.Open(path, FileMode.Create, FileAccess.ReadWrite))//создали новый файл
+                {
+                    Encoder.Save(jpegStreamOut);//сохранили новый файл
+                }
+            }
 //            bmp.Save(path, ImageCodecInfo.GetImageEncoders().FirstOrDefault(x => x.FormatID == ImageFormat.Jpeg.Guid), encoderParameters);
         }
 
