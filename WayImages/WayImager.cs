@@ -140,7 +140,7 @@
                 string nameForImage = numOfImgs.ToString($"D{count.ToString().Length}");
 
                 temp = GetImage(p);
-                SaveJPG(temp, $"{Path}/{nameForImage}.jpg");
+                SaveJPG(temp, p, $"{Path}/{nameForImage}.jpg");
                 bw.ReportProgress(100 * numOfImgs / count);
                 numOfImgs++;
 
@@ -167,16 +167,6 @@
 
             img = img.Clone(new Rectangle(img.Width / 2 - sizeW / 2, img.Height / 2 - sizeH / 2, sizeW, sizeH), img.PixelFormat);
 
-            //установка широты и долготы
-            tempProp.Len = 8;
-            tempProp.Type = 5;
-            tempProp.Id = 2;
-            tempProp.Value = BitConverter.GetBytes(rational((double)point.Latitude));
-            img.SetPropertyItem(tempProp);
-            tempProp.Id = 4;
-            tempProp.Value = BitConverter.GetBytes(rational((double)point.Longitude));
-            img.SetPropertyItem(tempProp);
-
             return img;
         }
 
@@ -196,14 +186,53 @@
             return bmp;
         }
 
-        private static void SaveJPG(Bitmap bmp, string path)
+        private static void SaveJPG(Bitmap bmp, MyPoint point, string path)
         {
             EncoderParameters encoderParameters = new EncoderParameters(1);
             encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 100L);
 
-            // Добавить параметры изображения (высота и т.п.)
+            /// ПАРАМЕТРЫ ИЗОБРАЖЕНИЯ
 
-            bmp.Save(path, ImageCodecInfo.GetImageEncoders().FirstOrDefault(x => x.FormatID == ImageFormat.Jpeg.Guid), encoderParameters);
+            // Декодер нужно передавать в эту функцию - то есть переписать Bitmap на BitmapDecoder
+            BitmapDecoder decoder;
+
+            using (MemoryStream s = new MemoryStream())
+            {
+                bmp.Save(s, ImageFormat.Png);
+
+
+                //BitmapDecoder decoder = JpegBitmapDecoder.Create(new Uri($"https://maps.googleapis.com/maps/api/staticmap?center=56.8746803 53.3047833&zoom=15&size=1280x1280&maptype=satellite&key=AIzaSyBfmTeq_d7lCghqlL_kX29Qsr2vQIB0UdA&format=png&scale=2"), BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.Default);
+                decoder = JpegBitmapDecoder.Create(s, BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.Default);
+
+
+                // Формируем параметры изображения (высота и т.п.)
+                BitmapMetadata TmpImgEXIF = new BitmapMetadata("jpg");
+
+                TmpImgEXIF.SetQuery("/app1/ifd/gps/{ushort=1}", "N");             //широта
+                TmpImgEXIF.SetQuery("/app1/ifd/gps/{ushort=3}", "E");             //долгота
+                TmpImgEXIF.SetQuery("/app1/ifd/gps/{ushort=0}", "2.2.0.0");            //версия
+                TmpImgEXIF.SetQuery("/app1/ifd/gps/{ushort=2}", rational(95.3));            //высота - ее в другой параметр потом
+
+                //Запись широты
+                ulong[] latitude = getCoordWithDegMinSec((double)point.Latitude);
+                TmpImgEXIF.SetQuery("/app1/ifd/gps/{ushort=2}", latitude);
+
+                //Запись долготы
+                ulong[] longitude = getCoordWithDegMinSec((double)point.Longitude);
+                TmpImgEXIF.SetQuery("/app1/ifd/gps/{ushort=4}", longitude);
+
+                //создадим новый файл снимка, в который перенесем все, кроме метаданных, из первого файла, 
+                //а метаданные возьмем те, которые мы изменили.
+                JpegBitmapEncoder Encoder = new JpegBitmapEncoder();//создали новый энкодер для Jpeg
+
+                Encoder.Frames.Add(BitmapFrame.Create(decoder.Frames[0], decoder.Frames[0].Thumbnail, TmpImgEXIF, decoder.Frames[0].ColorContexts)); //добавили в энкодер новый кадр(он там всего один) с указанными параметрами
+
+                using (Stream jpegStreamOut = File.Open(path, FileMode.Create, FileAccess.ReadWrite))//создали новый файл
+                {
+                    Encoder.Save(jpegStreamOut);//сохранили новый файл
+                }
+            }
+            //bmp.Save(path, ImageCodecInfo.GetImageEncoders().FirstOrDefault(x => x.FormatID == ImageFormat.Jpeg.Guid), encoderParameters);
         }
 
         private static ulong rational(double a)
@@ -214,6 +243,18 @@
             tmp = (ulong)denom << 32;
             tmp |= (ulong)num;
             return tmp;
+        }
+
+        /// Перевод десятичных координат в градусы, минуты, секунды
+        private static ulong[] getCoordWithDegMinSec(double coord)
+        {
+            double degree = Math.Floor(coord);
+            double minute = Math.Floor((coord - degree) * 60);
+            double second = ((coord - degree) * 60 - minute) * 60;
+
+            ulong[] newCoord = { rational(degree), rational(minute), rational(second) };
+
+            return newCoord;
         }
     }
 }
