@@ -79,7 +79,7 @@
             Data.Add(
                 new MyPoint
                 {
-                    Latitude = 56.8806803m,
+                    Latitude = 56.8766803m,
                     Longitude = 53.2988932m,
                     H = 0
                 });
@@ -90,20 +90,20 @@
                     Longitude = 53.2929387m,
                     H = 0
                 });
-            Data.Add(
-                new MyPoint
-                {
-                    Latitude = 56.8699838m,
-                    Longitude = 53.2988932m,
-                    H = 0
-                });
-            Data.Add(
-                new MyPoint
-                {
-                    Latitude = 56.8746803m,
-                    Longitude = 53.3047833m,
-                    H = 0
-                });
+            //Data.Add(
+            //    new MyPoint
+            //    {
+            //        Latitude = 56.8699838m,
+            //        Longitude = 53.2988932m,
+            //        H = 0
+            //    });
+            //Data.Add(
+            //    new MyPoint
+            //    {
+            //        Latitude = 56.8746803m,
+            //        Longitude = 53.3047833m,
+            //        H = 0
+            //    });
         }
 
         private void ButtonFolder_Click(object sender, RoutedEventArgs e)
