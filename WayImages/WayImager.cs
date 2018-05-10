@@ -21,7 +21,7 @@
         public static string Path { get; set; }
         public static float SpeedW { get; set; }
         public static int SpeedH { get; set; }
-
+        private const string key = "AIzaSyBfmTeq_d7lCghqlL_kX29Qsr2vQIB0UdA";
         private static WebClient webClient;
 
         const int sizeW = 900;
@@ -46,7 +46,7 @@
                 sb.AppendFormat("|{0:f6},{1:f6}", p.Latitude, p.Longitude);
             }
 
-            Uri uri = new Uri($"http://maps.googleapis.com/maps/api/staticmap?path=color:0xff0000|weight:5{sb.ToString()}&scale=2&format=png&size=1280x1280&maptype=satellite");
+            Uri uri = new Uri($"http://maps.googleapis.com/maps/api/staticmap?path=color:0xff0000|weight:5{sb.ToString()}&scale=2&format=png&size=1280x1280&maptype=satellite&key={key}");
             // Сохранение добавить
 
             return new BitmapImage(uri);
@@ -91,7 +91,7 @@
             else
             {
                 now.Yaw = Ways.Last().Yaw;
-            }            
+            }
 
             while (len > Speed)
             {
@@ -108,7 +108,7 @@
                 }
 
                 spLat = (decimal)Math.Cos((new Angle(now.Yaw)).ToRad()) * Speed;
-                spLong = (decimal)Math.Cos((new Angle(90 + now.Yaw)).ToRad()) * Speed;                
+                spLong = (decimal)Math.Cos((new Angle(90 + now.Yaw)).ToRad()) * Speed;
                 now.Latitude += spLat;
                 now.Longitude += spLong;
 
@@ -153,18 +153,14 @@
 
         private static Bitmap GetImage(MyPoint point)
         {
-            const string key = "AIzaSyBfmTeq_d7lCghqlL_kX29Qsr2vQIB0UdA";
             int zoom = 15;
 
             string uri = $"https://maps.googleapis.com/maps/api/staticmap?center= {point.Latitude} {point.Longitude}&zoom={zoom}&size=1280x1280&maptype=satellite&key={key}&format=png&scale=2";
 
             Bitmap img = new Bitmap(new MemoryStream(webClient.DownloadData(uri)));
 
-            PropertyItem tempProp = img.PropertyItems.First();
-
             //пока только поворот(и тот по ощущения не правильный)
             img = RotateImage(img, point.Yaw);
-
             img = img.Clone(new Rectangle(img.Width / 2 - sizeW / 2, img.Height / 2 - sizeH / 2, sizeW, sizeH), img.PixelFormat);
 
             return img;
@@ -188,22 +184,13 @@
 
         private static void SaveJPG(Bitmap bmp, MyPoint point, string path)
         {
-            EncoderParameters encoderParameters = new EncoderParameters(1);
-            encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 100L);
-
-            /// ПАРАМЕТРЫ ИЗОБРАЖЕНИЯ
-
-            // Декодер нужно передавать в эту функцию - то есть переписать Bitmap на BitmapDecoder
+            /// ПАРАМЕТРЫ ИЗОБРАЖЕНИЯ (переименовать функцию?)
             BitmapDecoder decoder;
 
             using (MemoryStream s = new MemoryStream())
             {
                 bmp.Save(s, ImageFormat.Png);
-
-
-                //BitmapDecoder decoder = JpegBitmapDecoder.Create(new Uri($"https://maps.googleapis.com/maps/api/staticmap?center=56.8746803 53.3047833&zoom=15&size=1280x1280&maptype=satellite&key=AIzaSyBfmTeq_d7lCghqlL_kX29Qsr2vQIB0UdA&format=png&scale=2"), BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.Default);
                 decoder = JpegBitmapDecoder.Create(s, BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.Default);
-
 
                 // Формируем параметры изображения (высота и т.п.)
                 BitmapMetadata TmpImgEXIF = new BitmapMetadata("jpg");
@@ -221,18 +208,16 @@
                 ulong[] longitude = getCoordWithDegMinSec((double)point.Longitude);
                 TmpImgEXIF.SetQuery("/app1/ifd/gps/{ushort=4}", longitude);
 
-                //создадим новый файл снимка, в который перенесем все, кроме метаданных, из первого файла, 
-                //а метаданные возьмем те, которые мы изменили.
-                JpegBitmapEncoder Encoder = new JpegBitmapEncoder();//создали новый энкодер для Jpeg
+                //Создание нового изображения, на основе входного и добавленных мета-данных
+                JpegBitmapEncoder Encoder = new JpegBitmapEncoder();
 
                 Encoder.Frames.Add(BitmapFrame.Create(decoder.Frames[0], decoder.Frames[0].Thumbnail, TmpImgEXIF, decoder.Frames[0].ColorContexts)); //добавили в энкодер новый кадр(он там всего один) с указанными параметрами
 
-                using (Stream jpegStreamOut = File.Open(path, FileMode.Create, FileAccess.ReadWrite))//создали новый файл
+                using (Stream jpegStreamOut = File.Open(path, FileMode.Create, FileAccess.ReadWrite))
                 {
-                    Encoder.Save(jpegStreamOut);//сохранили новый файл
+                    Encoder.Save(jpegStreamOut);
                 }
             }
-            //bmp.Save(path, ImageCodecInfo.GetImageEncoders().FirstOrDefault(x => x.FormatID == ImageFormat.Jpeg.Guid), encoderParameters);
         }
 
         private static ulong rational(double a)
@@ -250,11 +235,19 @@
         {
             double degree = Math.Floor(coord);
             double minute = Math.Floor((coord - degree) * 60);
-            double second = ((coord - degree) * 60 - minute) * 60;
+            double second = Math.Round(((coord - degree) * 60 - minute) * 60, 3);
 
             ulong[] newCoord = { rational(degree), rational(minute), rational(second) };
 
             return newCoord;
+        }
+
+        /// Перевод координат из градусов, минут, секунд в десятичный вид
+        private static ulong getCoordDecimal(double deg, double min, double sec)
+        {
+            double coord = deg + min / 60 + sec / 3600;
+
+            return rational(coord);
         }
     }
 }

@@ -12,7 +12,7 @@
         {
             Data = data;
             InitializeComponent();
-            Browser.Navigate("https://www.google.ru/maps/@56.8742088,53.3011972,316m/data=!3m1!1e3?hl=ru");
+            Browser.Navigate("https://www.google.ru/maps/@56.8742088,53.3011972,316m/data=!3m1!1e3");
         }
 
         private void ButtonExit_Click(object sender, RoutedEventArgs e)

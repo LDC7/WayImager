@@ -19,7 +19,7 @@
             InitializeComponent();
             Data = new List<MyPoint>();
             MainDataGrid.ItemsSource = Data;
-            TextBoxPath.Text = $"{Assembly.GetExecutingAssembly().Location}/{WayImager.Path}";
+            TextBoxPath.Text = $"{Assembly.GetExecutingAssembly().Location}\\{WayImager.Path}";
             InitTestData();
             MainProgressBar.IsIndeterminate = false;
         }
