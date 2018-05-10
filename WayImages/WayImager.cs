@@ -24,8 +24,8 @@
         private const string key = "AIzaSyBfmTeq_d7lCghqlL_kX29Qsr2vQIB0UdA";
         private static WebClient webClient;
 
-        const int sizeW = 900;
-        const int sizeH = 900;
+        const int sizeW = 320;
+        const int sizeH = 240;
 
         static WayImager()
         {
@@ -155,7 +155,7 @@
         {
             int zoom = 15;
 
-            string uri = $"https://maps.googleapis.com/maps/api/staticmap?center= {point.Latitude} {point.Longitude}&zoom={zoom}&size=1280x1280&maptype=satellite&key={key}&format=png&scale=2";
+            string uri = $"https://maps.googleapis.com/maps/api/staticmap?center= {point.Latitude} {point.Longitude}&zoom={zoom}&size=640x640&maptype=satellite&key={key}&format=png&scale=1";
 
             Bitmap img = new Bitmap(new MemoryStream(webClient.DownloadData(uri)));
 
