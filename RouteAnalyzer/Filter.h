@@ -9,7 +9,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
-namespace RouteAnalizer
+namespace RouteAnalyzer
 {
 #define PTYPE_MAX 1
 #define PTYPE_MIN 2

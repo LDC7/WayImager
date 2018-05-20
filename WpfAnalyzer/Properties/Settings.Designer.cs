@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WpfAnalizer.Properties
+namespace WpfAnalyzer.Properties
 {
 
 

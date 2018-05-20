@@ -1,7 +1,7 @@
 ﻿namespace WpfAnalizer
 {
     using System.Windows;
-    using RouteAnalizer;
+    using RouteAnalyzer;
 
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
@@ -20,7 +20,8 @@
 
         private void ButtonExecute_Click(object sender, RoutedEventArgs e)
         {
-            RouteAnalizer.Filter fil = new RouteAnalizer.Filter();
+            Filter filter = new Filter();
+            filter.Process();
         }
     }
 }
