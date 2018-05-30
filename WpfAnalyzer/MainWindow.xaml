@@ -5,10 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfAnalizer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="RouteAnalyzer" Height="350" Width="525">
     <Grid>
         <Button x:Name="ButtonExit" Content="Выход" HorizontalAlignment="Left" Margin="432,289,0,0" VerticalAlignment="Top" Width="75" Click="ButtonExit_Click"/>
-        <Button x:Name="ButtonExecute" Content="Выполнить" HorizontalAlignment="Left" Margin="332,174,0,0" VerticalAlignment="Top" Width="75" Click="ButtonExecute_Click"/>
-
+        <Button x:Name="ButtonExecute" Content="Выполнить" HorizontalAlignment="Left" Margin="432,10,0,0" VerticalAlignment="Top" Width="75" Click="ButtonExecute_Click"/>
+        <TextBox x:Name="TextBoxInPath" HorizontalAlignment="Left" Height="70" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="296" IsEnabled="False"/>
+        <TextBox x:Name="TextBoxOutPath" HorizontalAlignment="Left" Height="70" Margin="10,85,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="296" IsEnabled="False"/>
+        <Button x:Name="ButtonInputFile" Content="Выбрать файл" HorizontalAlignment="Left" Margin="311,60,0,0" VerticalAlignment="Top" Width="100" Click="ButtonInputFile_Click"/>
+        <Button x:Name="ButtonOutFolder" Content="Выбрать папку" HorizontalAlignment="Left" Margin="311,135,0,0" VerticalAlignment="Top" Width="100" Click="ButtonOutFolder_Click"/>
+   
     </Grid>
 </Window>

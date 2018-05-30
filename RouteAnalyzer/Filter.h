@@ -1,55 +1,109 @@
+// ClassLibrary1.h
+
 #pragma once
 
+
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <set>
+#include <string>
 #include "Blob.h"
 #include "PointsInfo.h"
-#include <vector>
-#include <set>
-#include <iostream>
-#include <opencv2/core.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/imgproc.hpp>
+#include "TrackedPoint.h"
 
-namespace RouteAnalyzer
-{
 #define PTYPE_MAX 1
 #define PTYPE_MIN 2
 
-	using namespace cv;
+namespace RouteAnalyzer
+{
+	using namespace System;
 	using namespace std;
+	using namespace cv;
 
 	public ref class Filter
 	{
-	public:
+	private:
+		System::String ^inStr;
+		System::String ^outStr;
 
-		double CorrWindowSize = 15;
-		double MinMaxWindowSize = 15;
 		double ZonePercent = 100;
-		double NeighbourRadius = 4;
-		double MaxTimeDead = 10;
-		double DispWinSize = 9;
+		double CorrWindowSize = 15;
 		double MinCorrValue = 0.3;
+		double MinMaxWindowSize = 15;
+		double WavePercent = 20;
 		double BlobSquare1Px = 0;
 		double BlobSquare2Px = 20;
-		double WavePercent = 20;
+		double NeighbourRadius = 4;
+		double MaxTimeDead = 10;
+		int MapWinSize = 61;
+		double DispWinSize = 9;
 
+	public:
 		void Process()
 		{
-			Mat Image = imread("input.png", IMREAD_COLOR);
+			string inPath, outPath;
+
+			MarshalString(inStr, inPath);
+			MarshalString(outStr, outPath);
+
+			Mat Image = imread(inPath, IMREAD_COLOR);
 			Mat &inImg = Image;
 
-			Mat ip, ipp, corrImg;
-
 			cvtColor(inImg, inImg, CV_BGR2GRAY);
+
+			PointsInfo pointsInfo;
+			Mat points;
+
+			GettingPoints(inImg, outPath, points, pointsInfo);
+
+			Mat pointsMap;
+
+			GettingPointsMap(points, pointsMap, outPath);
+
+			Mat dispMap;
+
+			GettingDispersion(inImg, dispMap, outPath);
+
+			Unite(Image, pointsMap, dispMap, inImg, outPath);
+		}
+
+		void SetPaths(System::String ^inStr, System::String ^outStr)
+		{
+			this->inStr = inStr;
+			this->outStr = outStr;
+		}
+
+	private:
+		static void MarshalString(System::String ^ s, string& os)
+		{
+			using namespace Runtime::InteropServices;
+			const char* chars =
+				(const char*)(Marshal::StringToHGlobalAnsi(s)).ToPointer();
+			os = chars;
+			Marshal::FreeHGlobal(IntPtr((void*)chars));
+		}
+
+		void GettingPoints(Mat &inImg, string outPath, Mat& points, PointsInfo &pointsInfo)
+		{
+			Mat ip, ipp, corrImg;
+			Mat outImg = Mat::zeros(points.rows, points.cols, CV_8UC3);
+			Mat outImg2 = Mat::zeros(points.rows, points.cols, CV_8U);
+			Scalar scalar = Scalar(255, 255, 255);
+			vector<Blob> blobs;
+			uchar *rowuc;
+			int zoneTopBorder;
+			float *rowf;
+			double *res_row;
+			double *corrImg_row;
+
 			IntegralImage(inImg, ip, ipp);
 			Correlation(ip, ipp, corrImg);
 
 			Mat m = Mat::zeros(corrImg.size(), CV_64F);
-
 			for (int y = 0; y < corrImg.rows; y++)
 			{
-				double *res_row = m.ptr<double>(y);
-				double *corrImg_row = m.ptr<double>(y);
-
+				res_row = m.ptr<double>(y);
+				corrImg_row = m.ptr<double>(y);
 				for (int x = 0; x < corrImg.cols; x++)
 				{
 					if (corrImg_row[x] > 0)
@@ -61,231 +115,41 @@ namespace RouteAnalyzer
 			}
 
 			// Получение точек
-			Mat out_img;
-			vector<Blob> blobs;
-			PointsInfo pointsInfo;
-
-			Mat points;
 			ProcessMinMax(corrImg, points);
 			GetBlobs(points, corrImg, blobs, pointsInfo);
 			FilterBlobs(blobs, pointsInfo);
-			int zoneTopBorder = inImg.rows * ZonePercent / 100;
+			zoneTopBorder = inImg.rows * ZonePercent / 100;
 			CheckTrackedPoints(0, pointsInfo, zoneTopBorder);
 
 			points = Mat::zeros(points.rows, points.cols, CV_8UC3);
 			for (const auto blob : pointsInfo.Blobs)
 			{
-				Scalar temp = Scalar(255, 255, 255);
-				circle(points, blob.ExtremumPoint, 2, temp, -1);
+				circle(points, blob.ExtremumPoint, 2, scalar, -1);
 			}
-			imwrite("points.bmp", points);
-			cout << "points.bmp" << endl;
+			imwrite(outPath + "points.bmp", points);
 
-			Mat outImg = Mat::zeros(points.rows, points.cols, CV_8UC3);
 			for (const auto blob : pointsInfo.Blobs)
 			{
-				Scalar temp = Scalar(255, 255, 255);
-				circle(outImg, blob.ExtremumPoint, 3, temp, -1);
+				circle(outImg, blob.ExtremumPoint, 3, scalar, -1);
 			}
-			imwrite("pointsC.bmp", outImg);
-			cout << "pointsC.bmp" << endl;
+			imwrite(outPath + "pointsC.bmp", outImg);
 
 			outImg = Mat::zeros(points.rows, points.cols, CV_32F);
 			for (const auto blob : pointsInfo.Blobs)
 			{
-				float *row2 = outImg.ptr<float>(blob.ExtremumPoint.y);
-				row2[blob.ExtremumPoint.x] = abs(blob.ExtremumValue);
+				rowf = outImg.ptr<float>(blob.ExtremumPoint.y);
+				rowf[blob.ExtremumPoint.x] = abs(blob.ExtremumValue);
 			}
 			points = outImg;
-			imwrite("points2.bmp", points);
-			cout << "points2.bmp" << endl;
+			imwrite(outPath + "points2.bmp", points);
 
-			Mat outImg2 = Mat::zeros(points.rows, points.cols, CV_8U);
 			for (const auto blob : pointsInfo.Blobs)
 			{
-				uchar *row2 = outImg2.ptr<uchar>(blob.ExtremumPoint.y);
-				row2[blob.ExtremumPoint.x] = abs(blob.ExtremumValue) * 512;
+				rowuc = outImg2.ptr<uchar>(blob.ExtremumPoint.y);
+				rowuc[blob.ExtremumPoint.x] = abs(blob.ExtremumValue) * 512;
 			}
-			imwrite("outImg2.bmp", outImg2);
-			cout << "outImg2.bmp" << endl;
-
-
-			//карта точек		
-			Mat pointsMap = Mat::zeros(points.rows, points.cols, CV_32F);
-			float mV = 0;
-			int MapWinSize = 61;
-			int maxV = 0.5 * MapWinSize * MapWinSize;
-
-			for (int y = MapWinSize / 2; y < points.rows - MapWinSize / 2; y++)
-			{
-				float *row2 = pointsMap.ptr<float>(y);
-
-				for (int x = MapWinSize / 2; x < points.cols - MapWinSize / 2; x++)
-				{
-					float sum = 0;
-
-					for (int a = -MapWinSize / 2; a <= MapWinSize / 2; a++)
-					{
-						float *row_check = points.ptr<float>(y + a);
-
-						for (int b = -MapWinSize / 2; b <= MapWinSize / 2; b++)
-						{
-							sum += row_check[x + b];
-						}
-					}
-
-					if (sum > mV)
-					{
-						mV = sum;
-					}
-
-					row2[x] = sum;
-				}
-			}
-
-			Mat pointsMap3 = Mat::zeros(points.rows, points.cols, CV_8U);
-			for (int y = MapWinSize / 2; y < pointsMap3.rows - MapWinSize / 2; y++)
-			{
-				uchar *row_disp = pointsMap3.ptr<uchar>(y);
-				float *row2 = pointsMap.ptr<float>(y);
-
-				for (int x = MapWinSize / 2; x < pointsMap3.cols - MapWinSize / 2; x++)
-				{
-					uchar temp = (uchar)(row2[x] * 255 / mV);
-
-					if (temp > 130)
-					{
-						temp = temp * 200 / 255;
-					}
-					else
-					{
-						temp = 0;
-					}
-
-					row_disp[x] = temp;
-				}
-			}
-
-			imwrite("pointsMap.bmp", pointsMap3);
-			cout << "pointsMap.bmp" << endl;
-
-			//дисперсия
-			Mat disp = Mat::zeros(inImg.rows, inImg.cols, CV_8U);
-			int minV = 0;
-			maxV = 255 * DispWinSize * DispWinSize - 255;
-			mV = 0;
-
-			for (int y = DispWinSize / 2; y < inImg.rows - DispWinSize / 2; y++)
-			{
-				uchar *row = inImg.ptr<uchar>(y);
-				uchar *row_disp = disp.ptr<uchar>(y);
-
-				for (int x = DispWinSize / 2; x < inImg.cols - DispWinSize / 2; x++)
-				{
-					int raz = 0;
-
-					for (int a = -DispWinSize / 2; a <= DispWinSize / 2; a++)
-					{
-						uchar *row_check = inImg.ptr<uchar>(y + a);
-
-						for (int b = -DispWinSize / 2; b <= DispWinSize / 2; b++)
-						{
-							raz += abs(row_check[x + b] - row[x]);
-						}
-					}
-
-					if (raz > mV)
-					{
-						mV = raz;
-					}
-
-					int dx = maxV / 255;
-
-					raz /= dx;
-
-					row_disp[x] = raz;
-				}
-			}
-
-			for (int y = DispWinSize / 2; y < inImg.rows - DispWinSize / 2; y++)
-			{
-				uchar *row_disp = disp.ptr<uchar>(y);
-
-				for (int x = DispWinSize / 2; x < inImg.cols - DispWinSize / 2; x++)
-				{
-					int dx = maxV / 255;
-					int ddx = mV / 255;
-					row_disp[x] = row_disp[x] * dx / ddx;
-				}
-			}
-
-			imwrite("disp.bmp", disp);
-			cout << "disp.bmp" << endl;
-
-			//объединение
-			points = Mat::zeros(Image.rows, Image.cols, CV_8U);
-			resize(pointsMap3, points, Size(Image.cols, Image.rows));
-			//points = pointsMap3;
-			//cvtColor(points, points, CV_BGR2GRAY);
-
-			Mat outIm = Mat::zeros(disp.rows, disp.cols, CV_8U);
-			Mat outIm2 = Mat::zeros(disp.rows, disp.cols, CV_8U);
-			double coof1 = 5, coof2 = 15;
-			double dx = (sqrt(coof1*coof1 * 255 * 255 + coof2 *coof2 * 255 * 255) / sqrt(coof1*coof1 + coof2*coof2)) / 255.0;
-			double znam = sqrt(coof1*coof1 + coof2*coof2);
-			double temp;
-
-			for (int y = 0; y < disp.rows; y++)
-			{
-				uchar *row = points.ptr<uchar>(y);
-				uchar *row_disp = disp.ptr<uchar>(y);
-				uchar *out_row = outIm.ptr<uchar>(y);
-				uchar *out_row2 = outIm2.ptr<uchar>(y);
-
-				for (int x = 0; x < disp.cols; x++)
-				{
-					temp = sqrt(coof1 * coof1 * row[x] * row[x] + coof2 * coof2 * row_disp[x] * row_disp[x]) / znam;
-
-					if (temp > mV)
-					{
-						mV = temp;
-					}
-
-					temp /= dx;
-
-					out_row[x] = temp;
-
-					out_row2[x] = ((row[x] * row_disp[x] + 100) / 2) - 50;
-				}
-			}
-
-			for (int y = 0; y < outIm.rows; y++)
-			{
-				uchar *out_row = outIm.ptr<uchar>(y);
-
-				for (int x = 0; x < inImg.cols; x++)
-				{
-					int dx = maxV / 255;
-					int ddx = mV / 255;
-					out_row[x] = out_row[x] * dx / ddx;
-
-					if (out_row[x] < 60)
-					{
-						out_row[x] = 0;
-					}
-				}
-			}
-
-			imwrite("out.bmp", outIm);
-			cout << "out.bmp" << endl;
-			imwrite("out2.bmp", outIm2);
-			cout << "out2.bmp" << endl;
-
-			//waitKey();
+			imwrite(outPath + "outImg2.bmp", outImg2);
 		}
-
-
-	private:
 
 		void IntegralImage(const Mat &input, Mat &ip, Mat &ipp)
 		{
@@ -465,9 +329,78 @@ namespace RouteAnalyzer
 					}
 				}
 			}
-
 			info.MaxBlobsMap = maxBlobsMap;
 			info.MinBlobsMap = minBlobsMap;
+		}
+
+		void DetermineBlob(const Mat pointsMap, const Mat corrImg, Mat &blobsMap, Blob &blob)
+		{
+			int pointsCount = 0;
+			vector<Point2i> pointsToVisit;
+			int type = blob.Type;
+			Point2i ext = blob.ExtremumPoint;
+
+			if (ext.x >= 0 && ext.y >= 0 && ext.x < pointsMap.cols && ext.y < pointsMap.rows)
+			{
+				if (blobsMap.at<int>(ext) == 0)
+				{
+					pointsToVisit.push_back(blob.ExtremumPoint);
+				}
+			}
+
+			while (pointsToVisit.size() != 0)
+			{
+				Point2i point = pointsToVisit.back();
+				pointsToVisit.pop_back();
+
+				if (blob.Square > 1000)
+				{
+					return;
+				}
+
+				blobsMap.at<int>(point) = blob.Index;
+				blob.Square += 1;
+
+				for (int i = -1; i <= 1; i++)
+				{
+					for (int j = -1; j <= 1; j++)
+					{
+						Point2i newPoint = point + Point2i(i, j);
+
+						if (CheckBlobPoint(newPoint, pointsMap, blobsMap, pointsToVisit, blob))
+						{
+							if (CheckPointValue(newPoint, corrImg, blob))
+							{
+								pointsToVisit.push_back(newPoint);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		bool CheckBlobPoint(Point2i p, Mat pointsMap, Mat blobsMap, vector<Point2i> &pointsToVisit, Blob blob)
+		{
+			if (p.x >= 0 && p.y >= 0 && p.x < blobsMap.cols && p.y < blobsMap.rows)
+			{
+				if (blobsMap.at<int>(p) == 0 && find(pointsToVisit.begin(), pointsToVisit.end(), p) == pointsToVisit.end())
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		bool CheckPointValue(Point2i p, Mat corr_img, Blob blob)
+		{
+			double value = corr_img.at<double>(p);
+			double delta = (abs(blob.ExtremumValue) / 100) * WavePercent;
+			double minCheckValue = blob.ExtremumValue + delta;
+			double maxCheckValue = blob.ExtremumValue - delta;
+
+			return blob.Type == PTYPE_MAX && value >= maxCheckValue
+				|| blob.Type == PTYPE_MIN && value <= minCheckValue;
 		}
 
 		void FilterBlobs(vector<Blob> &blobs, PointsInfo &info)
@@ -558,91 +491,163 @@ namespace RouteAnalyzer
 			}
 		}
 
-		void DetermineBlob(const Mat pointsMap, const Mat corrImg, Mat &blobsMap, Blob &blob)
+		void GettingPointsMap(Mat &points, Mat &pointsMap3, string outPath)
 		{
-			int pointsCount = 0;
-			vector<Point2i> pointsToVisit;
-			int type = blob.Type;
-			Point2i ext = blob.ExtremumPoint;
+			Mat pointsMap = Mat::zeros(points.rows, points.cols, CV_32F);
+			pointsMap3 = Mat::zeros(points.rows, points.cols, CV_8U);
+			uchar *row_disp;
+			uchar temp;
+			float mV = 0;
+			float *row;
+			float sum;
+			float *row_check;
 
-			if (ext.x >= 0 && ext.y >= 0 && ext.x < pointsMap.cols && ext.y < pointsMap.rows)
+			for (int y = MapWinSize / 2; y < points.rows - MapWinSize / 2; y++)
 			{
-				if (blobsMap.at<int>(ext) == 0)
+				row = pointsMap.ptr<float>(y);
+				for (int x = MapWinSize / 2; x < points.cols - MapWinSize / 2; x++)
 				{
-					pointsToVisit.push_back(blob.ExtremumPoint);
+					sum = 0;
+					for (int a = -MapWinSize / 2; a <= MapWinSize / 2; a++)
+					{
+						row_check = points.ptr<float>(y + a);
+						for (int b = -MapWinSize / 2; b <= MapWinSize / 2; b++)
+						{
+							sum += row_check[x + b];
+						}
+					}
+					if (sum > mV)
+					{
+						mV = sum;
+					}
+					row[x] = sum;
+				}
+			}
+			for (int y = MapWinSize / 2; y < pointsMap3.rows - MapWinSize / 2; y++)
+			{
+				row_disp = pointsMap3.ptr<uchar>(y);
+				row = pointsMap.ptr<float>(y);
+				for (int x = MapWinSize / 2; x < pointsMap3.cols - MapWinSize / 2; x++)
+				{
+					temp = (uchar)(row[x] * 255 / mV);
+					if (temp > 130)
+					{
+						temp = temp * 200 / 255;
+					}
+					else
+					{
+						temp = 0;
+					}
+					row_disp[x] = temp;
+				}
+			}
+			imwrite(outPath + "pointsMap.bmp", pointsMap3);
+		}
+
+		void GettingDispersion(Mat &inImg, Mat &disp, string outPath)
+		{
+			disp = Mat::zeros(inImg.rows, inImg.cols, CV_8U);
+			uchar *row;
+			uchar *row_check;
+			uchar *row_disp;
+			int dx;
+			int ddx;
+			int maxV = 255 * DispWinSize * DispWinSize - 255;
+			int mV = 0;
+			int raz;
+
+			for (int y = DispWinSize / 2; y < inImg.rows - DispWinSize / 2; y++)
+			{
+				row = inImg.ptr<uchar>(y);
+				row_disp = disp.ptr<uchar>(y);
+				for (int x = DispWinSize / 2; x < inImg.cols - DispWinSize / 2; x++)
+				{
+					raz = 0;
+					for (int a = -DispWinSize / 2; a <= DispWinSize / 2; a++)
+					{
+						row_check = inImg.ptr<uchar>(y + a);
+
+						for (int b = -DispWinSize / 2; b <= DispWinSize / 2; b++)
+						{
+							raz += abs(row_check[x + b] - row[x]);
+						}
+					}
+					if (raz > mV)
+					{
+						mV = raz;
+					}
+					dx = maxV / 255;
+					raz /= dx;
+					row_disp[x] = raz;
+				}
+			}
+			for (int y = DispWinSize / 2; y < inImg.rows - DispWinSize / 2; y++)
+			{
+				row_disp = disp.ptr<uchar>(y);
+				for (int x = DispWinSize / 2; x < inImg.cols - DispWinSize / 2; x++)
+				{
+					dx = maxV / 255;
+					ddx = mV / 255;
+					row_disp[x] = row_disp[x] * dx / ddx;
+				}
+			}
+			imwrite(outPath + "disp.bmp", disp);
+		}
+
+		void Unite(Mat &Image, Mat &pointsMap3, Mat &disp, Mat &inImg, string outPath)
+		{
+			Mat points = Mat::zeros(Image.rows, Image.cols, CV_8U);
+			Mat outIm = Mat::zeros(disp.rows, disp.cols, CV_8U);
+			Mat outIm2 = Mat::zeros(disp.rows, disp.cols, CV_8U);
+			uchar *row;
+			uchar *row_disp;
+			uchar *out_row;
+			uchar *out_row2;
+			double coof1 = 5, coof2 = 15;
+			double dx = (sqrt(coof1*coof1 * 255 * 255 + coof2 *coof2 * 255 * 255) / sqrt(coof1*coof1 + coof2*coof2)) / 255.0;
+			double znam = sqrt(coof1*coof1 + coof2*coof2);
+			double temp;
+			double mV = 0;
+			double maxV = 0;
+
+			resize(pointsMap3, points, Size(Image.cols, Image.rows));
+			for (int y = 0; y < disp.rows; y++)
+			{
+				row = points.ptr<uchar>(y);
+				row_disp = disp.ptr<uchar>(y);
+				out_row = outIm.ptr<uchar>(y);
+				out_row2 = outIm2.ptr<uchar>(y);
+				for (int x = 0; x < disp.cols; x++)
+				{
+					temp = sqrt(coof1 * coof1 * row[x] * row[x] + coof2 * coof2 * row_disp[x] * row_disp[x]) / znam;
+					if (temp > mV)
+					{
+						mV = temp;
+					}
+					temp /= dx;
+					out_row[x] = temp;
+					out_row2[x] = ((row[x] * row_disp[x] + 100) / 2) - 50;
 				}
 			}
 
-			while (pointsToVisit.size() != 0)
+			for (int y = 0; y < outIm.rows; y++)
 			{
-				Point2i point = pointsToVisit.back();
-				pointsToVisit.pop_back();
-
-				if (blob.Square > 1000)
+				out_row = outIm.ptr<uchar>(y);
+				for (int x = 0; x < inImg.cols; x++)
 				{
-					return;
-				}
-
-				blobsMap.at<int>(point) = blob.Index;
-				blob.Square += 1;
-
-				for (int i = -1; i <= 1; i++)
-				{
-					for (int j = -1; j <= 1; j++)
+					int dx = maxV / 255;
+					int ddx = mV / 255;
+					out_row[x] = out_row[x] * dx / ddx;
+					if (out_row[x] < 60)
 					{
-						Point2i newPoint = point + Point2i(i, j);
-
-						if (CheckBlobPoint(newPoint, pointsMap, blobsMap, pointsToVisit, blob))
-						{
-							if (CheckPointValue(newPoint, corrImg, blob))
-							{
-								pointsToVisit.push_back(newPoint);
-							}
-						}
+						out_row[x] = 0;
 					}
 				}
 			}
+			imwrite(outPath + "out.bmp", outIm);
+			imwrite(outPath + "out2.bmp", outIm2);
 		}
 
-		bool CheckBlobPoint(Point2i p, Mat pointsMap, Mat blobsMap, vector<Point2i> &pointsToVisit, Blob blob)
-		{
-			if (p.x >= 0 && p.y >= 0 && p.x < blobsMap.cols && p.y < blobsMap.rows)
-			{
-				if (blobsMap.at<int>(p) == 0 && find(pointsToVisit.begin(), pointsToVisit.end(), p) == pointsToVisit.end())
-				{
-					return true;
-				}
-			}
 
-			return false;
-		}
-
-		bool CheckPointValue(Point2i p, Mat corr_img, Blob blob)
-		{
-			double value = corr_img.at<double>(p);
-			double delta = (abs(blob.ExtremumValue) / 100) * WavePercent;
-			double minCheckValue = blob.ExtremumValue + delta;
-			double maxCheckValue = blob.ExtremumValue - delta;
-
-			return blob.Type == PTYPE_MAX && value >= maxCheckValue
-				|| blob.Type == PTYPE_MIN && value <= minCheckValue;
-		}
-
-		void windowForTwoMats(Mat &mat1, Mat &mat2, int winSize, void func(uchar &val1, uchar &val2, int x, int y))
-		{
-			uchar *row1;
-			uchar *row2;
-
-			for (int y = winSize / 2; y < mat1.rows - winSize / 2; y++)
-			{
-				row1 = mat1.ptr<uchar>(y);
-				row2 = mat2.ptr<uchar>(y);
-
-				for (int x = winSize / 2; x < mat1.cols - winSize / 2; x++)
-				{
-					func(row1[x], row2[x], x, y);
-				}
-			}
-		}
 	};
 }
