@@ -1,0 +1,30 @@
+﻿<Window x:Class="WpfAnalizer.OptionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfAnalizer"
+        mc:Ignorable="d"
+        Title="Настройки" Height="333.993" Width="556.182" ResizeMode="NoResize">
+    <Grid>
+        <Button x:Name="ButtonExit" Content="Закрыть" HorizontalAlignment="Left" Margin="461,275,0,0" VerticalAlignment="Top" Width="75" Click="ButtonExit_Click"/>
+        <Label Content="Камера" HorizontalAlignment="Left" Margin="10,213,0,0" VerticalAlignment="Top"/>
+        <Label Content="Разрешение:" HorizontalAlignment="Left" Margin="10,244,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="TextBoxWidth" HorizontalAlignment="Left" Height="23" Margin="95,247,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="100" TextAlignment="Right" Text="{Binding Path=widthCamera}"/>
+        <TextBox x:Name="TextBoxHeight" HorizontalAlignment="Left" Height="23" Margin="221,247,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="100" TextAlignment="Right" Text="{Binding Path=heightCamera}"/>
+        <Label Content="x" HorizontalAlignment="Left" Margin="200,244,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="ButtonOK" Content="OK" HorizontalAlignment="Left" Margin="381,275,0,0" VerticalAlignment="Top" Width="75" Click="ButtonOK_Click"/>
+        <Label Content="Настройки" HorizontalAlignment="Left" Margin="10,96,0,0" VerticalAlignment="Top"/>
+        <Label Content="Поиск опорных точек" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+        <Label Content="Метод:" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="ComboBoxMethod" HorizontalAlignment="Left" Margin="151,45,0,0" VerticalAlignment="Top" Width="250" SelectionChanged="ComboBoxMethod_SelectionChanged"/>
+        <Separator HorizontalAlignment="Left" Height="19" Margin="0,72,0,0" VerticalAlignment="Top" Width="550"/>
+        <Button x:Name="ButtonMethodOptions" Content="Опции Метода" HorizontalAlignment="Left" Margin="406,47,0,0" VerticalAlignment="Top" Width="130" Click="ButtonMethodOptions_Click"/>
+        <Label Content="Окно плотности точек:" HorizontalAlignment="Left" Margin="10,127,0,0" VerticalAlignment="Top"/>
+        <Label Content="Окно дисперсии:" HorizontalAlignment="Left" Margin="10,158,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="TextBoxPointDensity" HorizontalAlignment="Left" Height="23" Margin="151,130,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="100" TextAlignment="Right" Text="{Binding mapWinSize}"/>
+        <TextBox x:Name="TextBoxDispersion" HorizontalAlignment="Left" Height="23" Margin="151,161,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="100" TextAlignment="Right" Text="{Binding dispWinSize}"/>
+        <Separator HorizontalAlignment="Left" Height="19" Margin="0,189,0,0" VerticalAlignment="Top" Width="550"/>
+
+    </Grid>
+</Window>

@@ -145,6 +145,10 @@
   <ItemGroup>
     <ClInclude Include="Blob.h" />
     <ClInclude Include="Filter.h" />
+    <ClInclude Include="IPointFinder.h" />
+    <ClInclude Include="MethodFactory.h" />
+    <ClInclude Include="MethodOfContrasts.h" />
+    <ClInclude Include="Options.h" />
     <ClInclude Include="PointsInfo.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Stdafx.h" />

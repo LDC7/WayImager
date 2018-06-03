@@ -8,9 +8,6 @@
     using System.Windows;
     using System.Windows.Forms;
 
-    /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         private Filter filter;
@@ -24,6 +21,8 @@
             TextBoxOutPath.Text = $"{progFolder}\\temp\\";
             TextBoxInPath.Text = $"{progFolder}\\input.png";
             filter.SetPaths(TextBoxInPath.Text, TextBoxOutPath.Text);
+            
+            filter.pointMethod = MethodFactory.GetMethod(-1);
         }
 
         private void ButtonExit_Click(object sender, RoutedEventArgs e)
@@ -81,6 +80,28 @@
             }
 
             return str;
+        }
+
+        private void ButtonEvaluateRoute_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ButtonLoadMap_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Multiselect = false;
+            ofd.Title = "Карта информативности";
+            if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                filter.LoadBufferMat(ofd.FileName);
+            }
+        }
+
+        private void ButtonOptions_Click(object sender, RoutedEventArgs e)
+        {
+            OptionWindow ow = new OptionWindow(filter);
+            ow.Show();
         }
     }
 }
