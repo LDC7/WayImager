@@ -1,4 +1,4 @@
-﻿namespace WpfAnalizer
+﻿namespace WpfAnalyzer
 {
     using RouteAnalyzer;
     using System;

@@ -5,6 +5,9 @@
 
 namespace RouteAnalyzer
 {
+	using namespace System;
+	using namespace System::Collections::Generic;
+
 	public ref class MethodFactory
 	{
 	public:
@@ -15,19 +18,17 @@ namespace RouteAnalyzer
 			switch (i)
 			{
 			case 0:
-				MethodOfContrasts ^method0;
-				method = method0;
+				method = gcnew MethodOfContrasts;
 			default:
-				MethodOfContrasts ^methoddef;
-				method = methoddef;
+				method = gcnew MethodOfContrasts;
 				break;
 			}
 			return method;
 		}
 
-		static System::Collections::Generic::List<System::String ^>^ GetList()
+		static List<System::String ^>^ GetList()
 		{
-			System::Collections::Generic::List<System::String ^> ^list;
+			List<System::String ^> ^list = gcnew List<System::String^>();
 
 			list->Add("Метод контрастов");
 

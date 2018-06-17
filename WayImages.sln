@@ -3,12 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WayImages", "WayImages\WayImages.csproj", "{3902D604-3117-4166-B2F3-C375F0DC7EDA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp", "WpfApp\WpfApp.csproj", "{0AC016A5-3B69-40A4-B113-949DDDF5D6DB}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClosePoints", "ClosePoints\ClosePoints.vcxproj", "{44FC53F3-E88B-436C-BDED-C6E46E9D44D7}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RouteAnalyzer", "RouteAnalyzer\RouteAnalyzer.vcxproj", "{3C20B091-DEF7-426D-B0B0-98AF24E44D29}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfAnalyzer", "WpfAnalyzer\WpfAnalyzer.csproj", "{938ED62F-28E6-4046-97F3-F48E1CA77363}"
@@ -23,40 +17,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3902D604-3117-4166-B2F3-C375F0DC7EDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3902D604-3117-4166-B2F3-C375F0DC7EDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3902D604-3117-4166-B2F3-C375F0DC7EDA}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{3902D604-3117-4166-B2F3-C375F0DC7EDA}.Debug|x64.Build.0 = Debug|Any CPU
-		{3902D604-3117-4166-B2F3-C375F0DC7EDA}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{3902D604-3117-4166-B2F3-C375F0DC7EDA}.Debug|x86.Build.0 = Debug|Any CPU
-		{3902D604-3117-4166-B2F3-C375F0DC7EDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3902D604-3117-4166-B2F3-C375F0DC7EDA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3902D604-3117-4166-B2F3-C375F0DC7EDA}.Release|x64.ActiveCfg = Release|Any CPU
-		{3902D604-3117-4166-B2F3-C375F0DC7EDA}.Release|x64.Build.0 = Release|Any CPU
-		{3902D604-3117-4166-B2F3-C375F0DC7EDA}.Release|x86.ActiveCfg = Release|Any CPU
-		{3902D604-3117-4166-B2F3-C375F0DC7EDA}.Release|x86.Build.0 = Release|Any CPU
-		{0AC016A5-3B69-40A4-B113-949DDDF5D6DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0AC016A5-3B69-40A4-B113-949DDDF5D6DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0AC016A5-3B69-40A4-B113-949DDDF5D6DB}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{0AC016A5-3B69-40A4-B113-949DDDF5D6DB}.Debug|x64.Build.0 = Debug|Any CPU
-		{0AC016A5-3B69-40A4-B113-949DDDF5D6DB}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{0AC016A5-3B69-40A4-B113-949DDDF5D6DB}.Debug|x86.Build.0 = Debug|Any CPU
-		{0AC016A5-3B69-40A4-B113-949DDDF5D6DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0AC016A5-3B69-40A4-B113-949DDDF5D6DB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0AC016A5-3B69-40A4-B113-949DDDF5D6DB}.Release|x64.ActiveCfg = Release|Any CPU
-		{0AC016A5-3B69-40A4-B113-949DDDF5D6DB}.Release|x64.Build.0 = Release|Any CPU
-		{0AC016A5-3B69-40A4-B113-949DDDF5D6DB}.Release|x86.ActiveCfg = Release|Any CPU
-		{0AC016A5-3B69-40A4-B113-949DDDF5D6DB}.Release|x86.Build.0 = Release|Any CPU
-		{44FC53F3-E88B-436C-BDED-C6E46E9D44D7}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{44FC53F3-E88B-436C-BDED-C6E46E9D44D7}.Debug|x64.ActiveCfg = Debug|x64
-		{44FC53F3-E88B-436C-BDED-C6E46E9D44D7}.Debug|x64.Build.0 = Debug|x64
-		{44FC53F3-E88B-436C-BDED-C6E46E9D44D7}.Debug|x86.ActiveCfg = Debug|Win32
-		{44FC53F3-E88B-436C-BDED-C6E46E9D44D7}.Debug|x86.Build.0 = Debug|Win32
-		{44FC53F3-E88B-436C-BDED-C6E46E9D44D7}.Release|Any CPU.ActiveCfg = Release|Win32
-		{44FC53F3-E88B-436C-BDED-C6E46E9D44D7}.Release|x64.ActiveCfg = Release|x64
-		{44FC53F3-E88B-436C-BDED-C6E46E9D44D7}.Release|x64.Build.0 = Release|x64
-		{44FC53F3-E88B-436C-BDED-C6E46E9D44D7}.Release|x86.ActiveCfg = Release|Win32
-		{44FC53F3-E88B-436C-BDED-C6E46E9D44D7}.Release|x86.Build.0 = Release|Win32
 		{3C20B091-DEF7-426D-B0B0-98AF24E44D29}.Debug|Any CPU.ActiveCfg = Release|x64
 		{3C20B091-DEF7-426D-B0B0-98AF24E44D29}.Debug|Any CPU.Build.0 = Release|x64
 		{3C20B091-DEF7-426D-B0B0-98AF24E44D29}.Debug|x64.ActiveCfg = Debug|x64

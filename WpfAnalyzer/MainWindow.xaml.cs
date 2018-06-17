@@ -1,4 +1,4 @@
-﻿namespace WpfAnalizer
+﻿namespace WpfAnalyzer
 {
     using RouteAnalyzer;
     using System;
@@ -84,7 +84,16 @@
 
         private void ButtonEvaluateRoute_Click(object sender, RoutedEventArgs e)
         {
-
+            if (filter.HasOutMat)
+            {
+                RouterWindow rw = new RouterWindow(filter);
+                rw.Show();
+                this.WindowState = WindowState.Minimized;
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("Отсутствует загруженная карта информативности.", "ERROR", MessageBoxButton.OK);
+            }
         }
 
         private void ButtonLoadMap_Click(object sender, RoutedEventArgs e)

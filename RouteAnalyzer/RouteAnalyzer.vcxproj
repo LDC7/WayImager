@@ -143,14 +143,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Angle.h" />
     <ClInclude Include="Blob.h" />
     <ClInclude Include="Filter.h" />
+    <ClInclude Include="ImgPoint.h" />
     <ClInclude Include="IPointFinder.h" />
     <ClInclude Include="MethodFactory.h" />
     <ClInclude Include="MethodOfContrasts.h" />
     <ClInclude Include="Options.h" />
     <ClInclude Include="PointsInfo.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Route.h" />
+    <ClInclude Include="RoutePart.h" />
+    <ClInclude Include="Router.h" />
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="TrackedPoint.h" />
   </ItemGroup>

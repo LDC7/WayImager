@@ -1,4 +1,4 @@
-﻿namespace WpfAnalizer
+﻿namespace WpfAnalyzer
 {
     using RouteAnalyzer;
     using System.Windows;
@@ -6,25 +6,15 @@
     public partial class OptionWindow : Window
     {
         private Filter filter;
-        private Options options;
-
+        private OptionWrapper options;
         private IPointFinder method;
-        private int mapWinSize;
-        private int dispWinSize;
-        private int widthCamera;
-        private int heightCamera;
 
         public OptionWindow(Filter fil)
         {
             filter = fil;
-            options = filter.options;
-
-            mapWinSize = options.MapWinSize;
-            dispWinSize = (int)options.DispWinSize;
-            widthCamera = options.CameraWidth;
-            heightCamera = options.CameraHeight;
-
+            options = new OptionWrapper(filter.options);
             InitializeComponent();
+            DataContext = options;
 
             foreach (var s in MethodFactory.GetList())
             {
@@ -41,10 +31,7 @@
         private void ButtonOK_Click(object sender, RoutedEventArgs e)
         {
             filter.pointMethod = method;
-            options.MapWinSize = mapWinSize;
-            options.DispWinSize = dispWinSize;
-            options.CameraWidth = widthCamera;
-            options.CameraHeight = heightCamera;
+            filter.options = options.GetOptions();
 
             Close();
         }

@@ -5,14 +5,16 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <string>
-#include "Blob.h"
 #include "PointsInfo.h"
-#include "TrackedPoint.h"
 #include "Options.h"
 #include "IPointFinder.h"
 
 using namespace std;
 using namespace cv;
+
+#using <System.Drawing.dll>
+using namespace System::Drawing;
+
 
 namespace RouteAnalyzer
 {
@@ -24,20 +26,29 @@ namespace RouteAnalyzer
 		System::String ^inStr;
 		System::String ^outStr;
 
-	public:
-		Options ^options;
-		IPointFinder ^pointMethod;
-
-		Mat *bufferMat;
 		string *inPath, *outPath;
+
+	public:
+		Mat *outBufMat;
+		Mat *inpBufMat;
+
+		Options ^options = gcnew Options;
+		IPointFinder ^pointMethod;
+		bool HasOutMat = false;
+		bool HasInpMat = false;
 
 		void Process()
 		{
+			inPath = new string;
+			outPath = new string;
+
 			MarshalString(inStr, *inPath);
 			MarshalString(outStr, *outPath);
 
 			Mat Image = imread(*inPath, IMREAD_COLOR);
 			Mat &inImg = Image;
+			inpBufMat = new Mat(inImg);
+			HasInpMat = true;
 			PointsInfo pointsInfo;
 			Mat points;
 			Mat pointsMap;
@@ -51,7 +62,10 @@ namespace RouteAnalyzer
 
 			GettingDispersion(inImg, dispMap);
 
-			Unite(Image, pointsMap, dispMap, inImg);
+			Unite(pointsMap, dispMap);
+
+			delete inPath;
+			delete outPath;
 		}
 
 		void SetPaths(System::String ^inStr, System::String ^outStr)
@@ -65,10 +79,39 @@ namespace RouteAnalyzer
 			string Path;
 			MarshalString(path, Path);
 			Mat Image = imread(Path, IMREAD_GRAYSCALE);
-			bufferMat = &Image;
+			outBufMat = new Mat(Image);
+			HasOutMat = true;
+		}
+
+		void GetInpImg(Bitmap^% bmp)
+		{
+			bmp = cvMatToSharpBitmap(inpBufMat);
+		}
+
+		void GetInfMap(Bitmap^% bmp)
+		{
+			bmp = cvMatToSharpBitmap(outBufMat);
 		}
 
 	private:
+
+		static Bitmap^ cvMatToSharpBitmap(Mat *mat)
+		{
+			Bitmap ^bmp = gcnew Bitmap(mat->cols, mat->rows);
+			uchar *rowuc;
+			for (int y = 0; y < mat->rows; y++)
+			{
+				rowuc = mat->ptr<uchar>(y);
+				for (int x = 0; x < mat->cols; x++)
+				{
+					bmp->SetPixel(x, y, Color::FromArgb(rowuc[x], rowuc[x], rowuc[x]));
+				}
+			}
+			return bmp;
+
+			//return gcnew Bitmap(mat->cols, mat->rows, 4 * mat->rows, System::Drawing::Imaging::PixelFormat::Format24bppRgb, IntPtr(mat->data));
+		}
+
 		static void MarshalString(System::String ^ s, string& os)
 		{
 			using namespace Runtime::InteropServices;
@@ -78,158 +121,161 @@ namespace RouteAnalyzer
 			Marshal::FreeHGlobal(IntPtr((void*)chars));
 		}
 
-		void GettingPointsMap(Mat &points, Mat &pointsMap3)
+		void GettingPointsMap(Mat &points, Mat &pointsMap)
 		{
-			Mat pointsMap = Mat::zeros(points.rows, points.cols, CV_32F);
-			pointsMap3 = Mat::zeros(points.rows, points.cols, CV_8U);
-			uchar *row_disp;
+			pointsMap = Mat::zeros(points.rows, points.cols, CV_32F);
+			Mat MapImg = Mat::zeros(points.rows, points.cols, CV_8U);
+			uchar *rowuc;
 			uchar temp;
 			float mV = 0;
-			float *row;
+			float *rowf;
+			float *rowf2;
 			float sum;
-			float *row_check;
+			float max = options->MapWinSize*options->MapWinSize;
 
 			for (int y = options->MapWinSize / 2; y < points.rows - options->MapWinSize / 2; y++)
 			{
-				row = pointsMap.ptr<float>(y);
+				rowf = pointsMap.ptr<float>(y);
 				for (int x = options->MapWinSize / 2; x < points.cols - options->MapWinSize / 2; x++)
 				{
 					sum = 0;
 					for (int a = -options->MapWinSize / 2; a <= options->MapWinSize / 2; a++)
 					{
-						row_check = points.ptr<float>(y + a);
+						rowf2 = points.ptr<float>(y + a);
 						for (int b = -options->MapWinSize / 2; b <= options->MapWinSize / 2; b++)
 						{
-							sum += row_check[x + b];
+							sum += rowf2[x + b];
 						}
 					}
 					if (sum > mV)
 					{
 						mV = sum;
 					}
-					row[x] = sum;
+					rowf[x] = sum;
 				}
 			}
-			for (int y = options->MapWinSize / 2; y < pointsMap3.rows - options->MapWinSize / 2; y++)
+			for (int y = options->MapWinSize / 2; y < MapImg.rows - options->MapWinSize / 2; y++)
 			{
-				row_disp = pointsMap3.ptr<uchar>(y);
-				row = pointsMap.ptr<float>(y);
-				for (int x = options->MapWinSize / 2; x < pointsMap3.cols - options->MapWinSize / 2; x++)
+				rowuc = MapImg.ptr<uchar>(y);
+				rowf = pointsMap.ptr<float>(y);
+				for (int x = options->MapWinSize / 2; x < MapImg.cols - options->MapWinSize / 2; x++)
 				{
-					temp = (uchar)(row[x] * 255 / mV);
-					if (temp > 130)
+					temp = (uchar)(rowf[x] * 255 / mV);
+					if (temp > options->MinLvlForDensityMap)
 					{
-						temp = temp * 200 / 255;
+						temp = temp * options->MaxLvlForDensityMap / 255;
 					}
 					else
 					{
 						temp = 0;
 					}
-					row_disp[x] = temp;
+					rowuc[x] = temp;
+					rowf[x] /= max;
 				}
 			}
-			imwrite(*outPath + "pointsMap.bmp", pointsMap3);
+			imwrite(*outPath + "pointsMap.bmp", MapImg);
 		}
 
 		void GettingDispersion(Mat &inImg, Mat &disp)
 		{
-			disp = Mat::zeros(inImg.rows, inImg.cols, CV_8U);
-			uchar *row;
-			uchar *row_check;
-			uchar *row_disp;
-			int dx;
-			int ddx;
+			disp = Mat::zeros(inImg.rows, inImg.cols, CV_32F);
+			Mat DispImg = Mat::zeros(inImg.rows, inImg.cols, CV_8U);
+			uchar *rowu;
+			uchar *rowu2;
+			float *rowf;
 			int maxV = 255 * options->DispWinSize * options->DispWinSize - 255;
+			float dx = ((float)maxV) / 255.0f;
 			int mV = 0;
 			int raz;
+			float ddx;
 
 			for (int y = options->DispWinSize / 2; y < inImg.rows - options->DispWinSize / 2; y++)
 			{
-				row = inImg.ptr<uchar>(y);
-				row_disp = disp.ptr<uchar>(y);
+				rowu = inImg.ptr<uchar>(y);
+				rowf = disp.ptr<float>(y);
 				for (int x = options->DispWinSize / 2; x < inImg.cols - options->DispWinSize / 2; x++)
 				{
 					raz = 0;
 					for (int a = -options->DispWinSize / 2; a <= options->DispWinSize / 2; a++)
 					{
-						row_check = inImg.ptr<uchar>(y + a);
+						rowu2 = inImg.ptr<uchar>(y + a);
 
 						for (int b = -options->DispWinSize / 2; b <= options->DispWinSize / 2; b++)
 						{
-							raz += abs(row_check[x + b] - row[x]);
+							raz += abs(rowu2[x + b] - rowu[x]);
 						}
 					}
 					if (raz > mV)
 					{
 						mV = raz;
 					}
-					dx = maxV / 255;
-					raz /= dx;
-					row_disp[x] = raz;
+					rowf[x] = ((float)raz) / dx;
 				}
 			}
-			dx = maxV / 255;
-			ddx = mV / 255;
+
+			ddx = ((float)mV) / dx;
 			for (int y = options->DispWinSize / 2; y < inImg.rows - options->DispWinSize / 2; y++)
 			{
-				row_disp = disp.ptr<uchar>(y);
+				rowu = DispImg.ptr<uchar>(y);
+				rowf = disp.ptr<float>(y);
 				for (int x = options->DispWinSize / 2; x < inImg.cols - options->DispWinSize / 2; x++)
 				{
-					row_disp[x] = row_disp[x] * dx / ddx;
+					rowu[x] = (rowf[x] * 255) / ddx;
 				}
 			}
-			imwrite(*outPath + "dispersion.bmp", disp);
+			imwrite(*outPath + "dispersion.bmp", DispImg);
 		}
 
-		void Unite(Mat &Image, Mat &pointsMap3, Mat &disp, Mat &inImg)
+		void Unite(Mat &pointsMap, Mat &disp)
 		{
-			Mat points = Mat::zeros(Image.rows, Image.cols, CV_8U);
-			Mat outIm = Mat::zeros(disp.rows, disp.cols, CV_8U);
-			uchar *row;
-			uchar *row_disp;
-			uchar *out_row;
-			uchar *out_row2;
-			double coof1 = 5, coof2 = 15;
-			double dx = (sqrt(coof1*coof1 * 255 * 255 + coof2 *coof2 * 255 * 255) / sqrt(coof1*coof1 + coof2*coof2)) / 255.0;
+			Mat infMap = Mat::zeros(disp.rows, disp.cols, CV_32F);
+			Mat outImg = Mat::zeros(disp.rows, disp.cols, CV_8U);
+			uchar *rowu;
+			float *rowf;
+			float *rowf2;
+			float *rowf3;
+			double coof1 = options->CoefficientForDensity;
+			double coof2 = options->CoefficientForDispersion;
+			double dx = (sqrt(coof1*coof1 + coof2 *coof2) / sqrt(coof1*coof1 + coof2*coof2));
 			double ddx;
 			double znam = sqrt(coof1*coof1 + coof2*coof2);
 			double temp;
 			double mV = 0;
 
-			resize(pointsMap3, points, Size(Image.cols, Image.rows));
 			for (int y = 0; y < disp.rows; y++)
 			{
-				row = points.ptr<uchar>(y);
-				row_disp = disp.ptr<uchar>(y);
-				out_row = outIm.ptr<uchar>(y);
+				rowf = pointsMap.ptr<float>(y);
+				rowf2 = disp.ptr<float>(y);
+				rowf3 = infMap.ptr<float>(y);
 				for (int x = 0; x < disp.cols; x++)
 				{
-					temp = sqrt(coof1 * coof1 * row[x] * row[x] + coof2 * coof2 * row_disp[x] * row_disp[x]) / znam;
+					temp = sqrt(coof1 * coof1 * rowf[x] * rowf[x] + coof2 * coof2 * rowf2[x] * rowf2[x]) / znam;
 					if (temp > mV)
 					{
 						mV = temp;
 					}
 					temp /= dx;
-					out_row[x] = temp;
-					out_row2[x] = ((row[x] * row_disp[x] + 100) / 2) - 50;
+					rowf3[x] = temp;
 				}
 			}
 
-			ddx = mV / 255;
-			for (int y = 0; y < outIm.rows; y++)
+			ddx = mV / dx;
+			for (int y = 0; y < outImg.rows; y++)
 			{
-				out_row = outIm.ptr<uchar>(y);
-				for (int x = 0; x < inImg.cols; x++)
+				rowu = outImg.ptr<uchar>(y);
+				rowf = infMap.ptr<float>(y);
+				for (int x = 0; x < outImg.cols; x++)
 				{
-					out_row[x] = out_row[x] * dx / ddx;
-					if (out_row[x] < 60)
+					temp = (rowf[x] * 255) / ddx;
+					if (temp >= options->MinLimitForInfMap)
 					{
-						out_row[x] = 0;
+						rowu[x] = temp;
 					}
 				}
 			}
-			imwrite(*outPath + "informMap.bmp", outIm);
-			bufferMat = &outIm;
+			imwrite(*outPath + "informMap.bmp", outImg);
+			outBufMat = new Mat(outImg);
+			HasOutMat = true;
 		}
 
 

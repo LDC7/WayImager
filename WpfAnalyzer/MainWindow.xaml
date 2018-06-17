@@ -1,13 +1,13 @@
-﻿<Window x:Class="WpfAnalizer.MainWindow"
+﻿<Window x:Class="WpfAnalyzer.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfAnalizer"
+        xmlns:local="clr-namespace:WpfAnalyzer"
         mc:Ignorable="d"
-        Title="RouteAnalyzer" Height="350" Width="601" ResizeMode="NoResize">
+        Title="RouteAnalyzer" Height="201" Width="600" ResizeMode="NoResize">
     <Grid>
-        <Button x:Name="ButtonExit" Content="Выход" HorizontalAlignment="Left" Margin="508,289,0,0" VerticalAlignment="Top" Width="75" Click="ButtonExit_Click"/>
+        <Button x:Name="ButtonExit" Content="Выход" HorizontalAlignment="Left" Margin="435,135,0,0" VerticalAlignment="Top" Width="150" Click="ButtonExit_Click"/>
         <Button x:Name="ButtonEvaluateMap" Content="Оценить ортофотоплан" HorizontalAlignment="Left" Margin="435,10,0,0" VerticalAlignment="Top" Width="150" Click="ButtonExecute_Click"/>
         <TextBox x:Name="TextBoxInPath" HorizontalAlignment="Left" Height="70" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="296" IsEnabled="False"/>
         <TextBox x:Name="TextBoxOutPath" HorizontalAlignment="Left" Height="70" Margin="10,85,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="296" IsEnabled="False"/>
