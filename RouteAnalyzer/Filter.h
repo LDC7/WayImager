@@ -46,15 +46,15 @@ namespace RouteAnalyzer
 			MarshalString(outStr, *outPath);
 
 			Mat Image = imread(*inPath, IMREAD_COLOR);
-			Mat &inImg = Image;
-			inpBufMat = new Mat(inImg);
-			HasInpMat = true;
+			Mat &inImg = Image;			
 			PointsInfo pointsInfo;
 			Mat points;
 			Mat pointsMap;
 			Mat dispMap;
 
 			cvtColor(inImg, inImg, CV_BGR2GRAY);
+			inpBufMat = new Mat(inImg);
+			HasInpMat = true;
 
 			pointMethod->GettingPoints(inImg, points, pointsInfo, *outPath);
 

@@ -11,6 +11,9 @@ namespace RouteAnalyzer
 	public:
 		System::String^ Name;
 		List<RoutePart^> ^Parts;
+		int min = 256;
+		int max = -1;
+		bool Evaluated = false;
 
 		Route()
 		{

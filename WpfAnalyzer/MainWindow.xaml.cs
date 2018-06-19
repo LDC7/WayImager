@@ -2,6 +2,7 @@
 {
     using RouteAnalyzer;
     using System;
+    using System.ComponentModel;
     using System.IO;
     using System.Reflection;
     using System.Text;
@@ -21,7 +22,7 @@
             TextBoxOutPath.Text = $"{progFolder}\\temp\\";
             TextBoxInPath.Text = $"{progFolder}\\input.png";
             filter.SetPaths(TextBoxInPath.Text, TextBoxOutPath.Text);
-            
+
             filter.pointMethod = MethodFactory.GetMethod(-1);
         }
 
@@ -36,15 +37,11 @@
             {
                 Directory.CreateDirectory(TextBoxOutPath.Text);
                 filter.Process();
+                System.Windows.MessageBox.Show("Done", "Done", MessageBoxButton.OK);
             }
             catch (Exception ex)
             {
                 System.Windows.MessageBox.Show(ex.Message, "ERROR", MessageBoxButton.OK);
-                using (FileStream fs = new FileStream(TextBoxOutPath.Text + "log.txt", FileMode.Create))
-                {
-                    byte[] buf = Encoding.UTF8.GetBytes(GetExceptionsLog(ex));
-                    fs.Write(buf, 0, buf.Length);
-                }
             }
         }
 
@@ -88,7 +85,7 @@
             {
                 RouterWindow rw = new RouterWindow(filter);
                 rw.Show();
-                this.WindowState = WindowState.Minimized;
+                //this.WindowState = WindowState.Minimized;
             }
             else
             {

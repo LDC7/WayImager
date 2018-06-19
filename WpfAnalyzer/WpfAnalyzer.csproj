@@ -87,9 +87,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConvertBitmapToBitmapImage.cs" />
+    <Compile Include="MyList.cs" />
+    <Compile Include="AltPathWindow.xaml.cs">
+      <DependentUpon>AltPathWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="OptionWrapper.cs" />
     <Compile Include="PointsWindow.xaml.cs">
       <DependentUpon>PointsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GPSWindow.xaml.cs">
+      <DependentUpon>GPSWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="RouteWindow.xaml.cs">
       <DependentUpon>RouteWindow.xaml</DependentUpon>
@@ -132,7 +139,15 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="AltPathWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="PointsWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="GPSWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

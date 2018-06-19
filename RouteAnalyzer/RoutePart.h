@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ImgPoint.h"
-#include "Angle.h"
 
 using namespace std;
 
@@ -16,12 +15,25 @@ namespace RouteAnalyzer
 		ImgPoint ^pointStart;
 		ImgPoint ^pointEnd;
 		List<ImgPoint^> ^IntermidiatePoints;
-		Angle^ angle;
+		int min = 256;
+		int max = -1;
 
 		RoutePart(ImgPoint ^start, ImgPoint ^end)
 		{
 			pointStart = start;
 			pointEnd = end;
+		}
+
+		void SetMinMax(int val)
+		{
+			if (min > val)
+			{
+				min = val;
+			}
+			if (max < val)
+			{
+				max = val;
+			}
 		}
 	};
 }

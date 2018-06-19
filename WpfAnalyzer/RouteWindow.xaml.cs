@@ -2,41 +2,57 @@
 {
     using RouteAnalyzer;
     using System;
-    using System.Collections.Generic;
-    using System.Drawing;
+    using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
     using System.Windows;
+    using System.Windows.Input;
+    using System.Windows.Media;
+    using System.Windows.Media.Imaging;
 
     public partial class RouteWindow : Window
     {
-        private List<Route> rs;
+        private MyList<Route> rs;
         private Route route;
-        private Bitmap background;
-        private List<ImgPoint> data { get; set; }
+        private BitmapImage background;
+        private ObservableCollection<Point> data { get; set; }
 
-        public RouteWindow(Bitmap back, List<Route> routes, Route r = null)
+        public RouteWindow(RouterWindow owner, BitmapImage back, ref MyList<Route> routes, Route r = null)
         {
+            this.Owner = owner;
             InitializeComponent();
             route = r;
             background = back;
-            MainImg.Source = ConvertBitmapToBitmapImage.Convert(background);
-            data = new List<ImgPoint>();
-            RoutesDataGrid.ItemsSource = data;
+            MainImg.Source = background;
+            data = new ObservableCollection<Point>();
+            PointsDataGrid.ItemsSource = data;
             Closed += SaveBeforeClose;
             rs = routes;
             if (route == null)
             {
                 route = new Route();
-                route.Name = $"N{Guid.NewGuid().ToString()}";
+                route.Name = $"NewRoute{((RouterWindow)this.Owner).nrni}";
+                if (((RouterWindow)this.Owner).nrni == int.MaxValue)
+                {
+                    ((RouterWindow)this.Owner).nrni = int.MinValue;
+                }
+                ((RouterWindow)this.Owner).nrni++;
             }
             else
-            {                
-                data.Add(route.Parts[0].pointStart);
-                foreach (var p in route.Parts)
+            {
+                if (route.Parts.Count > 0)
                 {
-                    data.Add(p.pointEnd);
+                    data.Add(new Point(route.Parts[0].pointStart.x, route.Parts[0].pointStart.y));
+                    foreach (var p in route.Parts)
+                    {
+                        data.Add(new Point(p.pointEnd.x, p.pointEnd.y));
+                    }
                 }
             }
             TextBoxName.Text = route.Name;
+
+            BorderImg.MouseLeftButtonDown += Image_MouseDown;
+            data.CollectionChanged += reloadPoints;
+            reloadPoints(null, null);
         }
 
         private void ButtonExit_Click(object sender, RoutedEventArgs e)
@@ -48,10 +64,10 @@
         {
             route.Name = TextBoxName.Text;
             route.Parts.Clear();
-            
+
             for (int i = 0; i < data.Count - 1; i++)
             {
-                route.Parts.Add(new RoutePart(data[i], data[i + 1]));
+                route.Parts.Add(new RoutePart(new ImgPoint((int)data[i].X, (int)data[i].Y), new ImgPoint((int)data[i + 1].X, (int)data[i + 1].Y)));
             }
 
             rs.Add(route);
@@ -59,7 +75,36 @@
 
         private void ButtonGPS_Click(object sender, RoutedEventArgs e)
         {
+            GPSWindow gpsw = new GPSWindow(data, background.PixelWidth, background.PixelHeight);
+            gpsw.Show();
+        }
 
+        private void Image_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Point temp = e.GetPosition(this.BorderImg);
+
+            data.Add(new Point(
+                (int)(background.Width * temp.X / BorderImg.ActualWidth),
+                (int)(background.Height * temp.Y / BorderImg.ActualHeight)));
+        }
+
+        private void reloadPoints(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            int pSize = (int)((background.PixelWidth + background.PixelHeight) / 128);
+
+            DrawingVisual dv = new DrawingVisual();
+            using (DrawingContext dc = dv.RenderOpen())
+            {
+                dc.DrawImage(background, new Rect(0, 0, background.PixelWidth, background.PixelHeight));
+                foreach (var p in data)
+                {
+                    dc.DrawEllipse(Brushes.Green, null, p, pSize, pSize);
+                }
+            }
+
+            RenderTargetBitmap rtb = new RenderTargetBitmap((int)background.Width, (int)background.Height, 96, 96, PixelFormats.Pbgra32);
+            rtb.Render(dv);
+            MainImg.Source = rtb;
         }
     }
 }
