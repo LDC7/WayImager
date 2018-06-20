@@ -1,5 +1,4 @@
 #pragma once
-
 namespace RouteAnalyzer
 {
 	public ref class Options
@@ -14,8 +13,6 @@ namespace RouteAnalyzer
 		int CoefficientForDensity = 11000;
 		int CoefficientForDispersion = 1;
 		int MinLimitForInfMap = 60;
-
-
 		Options()
 		{
 		}

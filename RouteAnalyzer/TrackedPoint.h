@@ -5,16 +5,11 @@
 #include <vector>
 using namespace cv;
 using namespace std;
-
 struct TrackedPoint
 {
 	vector<Point2i> Coords;
-
 	int LifeTime;
-
 	int Type;
-
 	int TimeBorn;
-
 	int TimeDead;
 };

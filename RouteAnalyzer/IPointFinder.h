@@ -1,12 +1,9 @@
 #pragma once
-
 #include <string>
 #include <opencv2/core.hpp>
 #include "PointsInfo.h"
-
 using namespace cv;
 using namespace System::Collections::Generic;
-
 namespace RouteAnalyzer
 {
 	public ref class IPointFinder

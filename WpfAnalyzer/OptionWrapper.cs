@@ -4,11 +4,9 @@
     using System;
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
-
     public class OptionWrapper : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-
         private int _densityWinSize;
         private int _dispWinSize;
         private int _widthCamera;
@@ -18,7 +16,6 @@
         private int _coefficientForDensity;
         private int _coefficientForDispersion;
         private int _minLimitForInfMap;
-
         public OptionWrapper(Options options)
         {
             _densityWinSize = options.MapWinSize;
@@ -31,7 +28,6 @@
             _coefficientForDispersion = options.CoefficientForDensity;
             _minLimitForInfMap = options.MinLimitForInfMap;
         }
-
         public string densityWinSize
         {
             get { return _densityWinSize.ToString(); }
@@ -45,7 +41,6 @@
                 }
             }
         }
-
         public string dispWinSize
         {
             get { return _dispWinSize.ToString(); }
@@ -59,7 +54,6 @@
                 }
             }
         }
-
         public string widthCamera
         {
             get { return _widthCamera.ToString(); }
@@ -73,7 +67,6 @@
                 }
             }
         }
-
         public string heightCamera
         {
             get { return _heightCamera.ToString(); }
@@ -87,7 +80,6 @@
                 }
             }
         }
-
         public string minLvlForDensityMap
         {
             get { return _minLvlForDensityMap.ToString(); }
@@ -101,7 +93,6 @@
                 }
             }
         }
-
         public string maxLvlForDensityMap
         {
             get { return _maxLvlForDensityMap.ToString(); }
@@ -115,7 +106,6 @@
                 }
             }
         }
-
         public string coefficientForDensity
         {
             get { return _coefficientForDensity.ToString(); }
@@ -129,7 +119,6 @@
                 }
             }
         }
-
         public string coefficientForDispersion
         {
             get { return _coefficientForDispersion.ToString(); }
@@ -143,7 +132,6 @@
                 }
             }
         }
-
         public string minLimitForInfMap
         {
             get { return _minLimitForInfMap.ToString(); }
@@ -157,12 +145,10 @@
                 }
             }
         }
-
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
         public Options GetOptions()
         {
             Options op = new Options();

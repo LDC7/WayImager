@@ -3,21 +3,20 @@
     using RouteAnalyzer;
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Drawing;
     using System.Windows;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
-
     public partial class RouterWindow : Window
     {
         private Router router;
         private BitmapImage infBmp;
         private BitmapImage inpBmp;
-        public MyList<Route> data;
+        public ObservableCollection<Route> data;
         private List<string> rNames { get; set; }
         public int nrni = 0;
         public int arni = 0;
-
         public RouterWindow(Filter filter)
         {
             InitializeComponent();
@@ -31,17 +30,15 @@
             filter.GetInfMap(ref tempBmp);
             infBmp = ConvertBitmapToBitmapImage.Convert(tempBmp);
             ImageInfMap.Source = infBmp;
-            data = new MyList<Route>();
-            data.OnChangedCollection += ReloadDataGrid;
+            data = new ObservableCollection<Route>();
+            data.CollectionChanged += ReloadDataGrid;
             rNames = new List<string>();
             RoutesDataGrid.ItemsSource = rNames;
         }
-
         private void ButtonExit_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
-
         private void ButtonAdd_Click(object sender, RoutedEventArgs e)
         {
             RouteWindow rw;
@@ -55,12 +52,10 @@
             }
             rw.Show();
         }
-
         private void ButtonOpen_Click(object sender, RoutedEventArgs e)
         {
             Route r = data[RoutesDataGrid.SelectedIndex];
             data.RemoveAt(RoutesDataGrid.SelectedIndex);
-
             RouteWindow rw;
             if (inpBmp != null)
             {
@@ -72,7 +67,6 @@
             }
             rw.Show();
         }
-
         private void ButtonEvaluate_Click(object sender, RoutedEventArgs e)
         {
             if (RoutesDataGrid.SelectedIndex >= 0)
@@ -80,9 +74,8 @@
                 router.CreateRouteValue(data[RoutesDataGrid.SelectedIndex]);
                 RoutesDataGrid_SelectionChanged(null, null);
                 data[RoutesDataGrid.SelectedIndex].Evaluated = true;
-            }            
+            }
         }
-
         private void ButtonAltPaths_Click(object sender, RoutedEventArgs e)
         {
             if (RoutesDataGrid.SelectedIndex >= 0)
@@ -99,21 +92,18 @@
                 }
             }
         }
-
         private void RoutesDataGrid_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             if (RoutesDataGrid.SelectedIndex >= 0)
             {
                 int pSize = (int)((infBmp.Width + infBmp.Height) / 128);
                 var route = data[RoutesDataGrid.SelectedIndex];
-
                 DrawingVisual dv = new DrawingVisual();
                 using (DrawingContext dc = dv.RenderOpen())
                 {
                     dc.DrawImage(infBmp, new Rect(0, 0, infBmp.PixelWidth, infBmp.PixelHeight));
-
-                    int min = route.min < 0 ? 1 : route.min;
-                    decimal coofMax = route.max > 255 ? 1 : 255 / route.max;
+                    int min = route.min > 255 ? 0 : route.min;
+                    decimal coofMax = route.max <= 0 ? 1 : (255 / route.max);
                     byte val;
                     foreach (var p in route.Parts)
                     {
@@ -140,13 +130,11 @@
                         DrawEllipse(dc, p.pointEnd.x, p.pointEnd.y, val, pSize);
                     }
                 }
-
                 RenderTargetBitmap rtb = new RenderTargetBitmap((int)infBmp.Width, (int)infBmp.Height, 96, 96, PixelFormats.Pbgra32);
                 rtb.Render(dv);
                 ImageInfMap.Source = rtb;
             }
         }
-
         private void DrawLine(DrawingContext dc, int x1, int y1, int x2, int y2, byte val, double th)
         {
             dc.DrawLine(new System.Windows.Media.Pen(new SolidColorBrush(System.Windows.Media.Color.FromRgb((byte)(255 - val), val, 0)),
@@ -154,14 +142,12 @@
                                 new System.Windows.Point(x1, y1),
                                 new System.Windows.Point(x2, y2));
         }
-
         private void DrawEllipse(DrawingContext dc, int x, int y, byte val, int rad)
         {
             dc.DrawEllipse(new SolidColorBrush(System.Windows.Media.Color.FromRgb((byte)(255 - val), val, 0)), null,
                             new System.Windows.Point(x, y),
                             rad, rad);
         }
-
         private void ReloadDataGrid(object sender, EventArgs e)
         {
             rNames.Clear();

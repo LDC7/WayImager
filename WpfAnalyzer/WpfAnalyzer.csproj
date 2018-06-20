@@ -87,7 +87,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConvertBitmapToBitmapImage.cs" />
-    <Compile Include="MyList.cs" />
     <Compile Include="AltPathWindow.xaml.cs">
       <DependentUpon>AltPathWindow.xaml</DependentUpon>
     </Compile>

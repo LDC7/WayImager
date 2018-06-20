@@ -1,79 +1,57 @@
-// ClassLibrary1.h
-
 #pragma once
-
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <string>
 #include "PointsInfo.h"
 #include "Options.h"
 #include "IPointFinder.h"
-
 using namespace std;
 using namespace cv;
-
 #using <System.Drawing.dll>
 using namespace System::Drawing;
-
-
 namespace RouteAnalyzer
 {
 	using namespace System;
-
 	public ref class Filter
 	{
 	private:
 		System::String ^inStr;
 		System::String ^outStr;
-
 		string *inPath, *outPath;
-
 	public:
 		Mat *outBufMat;
 		Mat *inpBufMat;
-
 		Options ^options = gcnew Options;
 		IPointFinder ^pointMethod;
 		bool HasOutMat = false;
 		bool HasInpMat = false;
-
 		void Process()
 		{
 			inPath = new string;
 			outPath = new string;
-
 			MarshalString(inStr, *inPath);
 			MarshalString(outStr, *outPath);
-
 			Mat Image = imread(*inPath, IMREAD_COLOR);
 			Mat &inImg = Image;			
 			PointsInfo pointsInfo;
 			Mat points;
 			Mat pointsMap;
 			Mat dispMap;
-
 			cvtColor(inImg, inImg, CV_BGR2GRAY);
 			inpBufMat = new Mat(inImg);
 			HasInpMat = true;
-
 			pointMethod->GettingPoints(inImg, points, pointsInfo, *outPath);
-
 			GettingPointsMap(points, pointsMap);
-
 			GettingDispersion(inImg, dispMap);
-
 			Unite(pointsMap, dispMap);
-
 			delete inPath;
 			delete outPath;
 		}
-
 		void SetPaths(System::String ^inStr, System::String ^outStr)
 		{
 			this->inStr = inStr;
 			this->outStr = outStr;
 		}
-
 		void LoadBufferMat(System::String ^path)
 		{
 			string Path;
@@ -82,19 +60,15 @@ namespace RouteAnalyzer
 			outBufMat = new Mat(Image);
 			HasOutMat = true;
 		}
-
 		void GetInpImg(Bitmap^% bmp)
 		{
 			bmp = cvMatToSharpBitmap(inpBufMat);
 		}
-
 		void GetInfMap(Bitmap^% bmp)
 		{
 			bmp = cvMatToSharpBitmap(outBufMat);
 		}
-
 	private:
-
 		static Bitmap^ cvMatToSharpBitmap(Mat *mat)
 		{
 			Bitmap ^bmp = gcnew Bitmap(mat->cols, mat->rows);
@@ -108,10 +82,7 @@ namespace RouteAnalyzer
 				}
 			}
 			return bmp;
-
-			//return gcnew Bitmap(mat->cols, mat->rows, 4 * mat->rows, System::Drawing::Imaging::PixelFormat::Format24bppRgb, IntPtr(mat->data));
 		}
-
 		static void MarshalString(System::String ^ s, string& os)
 		{
 			using namespace Runtime::InteropServices;
@@ -120,7 +91,6 @@ namespace RouteAnalyzer
 			os = chars;
 			Marshal::FreeHGlobal(IntPtr((void*)chars));
 		}
-
 		void GettingPointsMap(Mat &points, Mat &pointsMap)
 		{
 			pointsMap = Mat::zeros(points.rows, points.cols, CV_32F);
@@ -132,7 +102,6 @@ namespace RouteAnalyzer
 			float *rowf2;
 			float sum;
 			float max = options->MapWinSize*options->MapWinSize;
-
 			for (int y = options->MapWinSize / 2; y < points.rows - options->MapWinSize / 2; y++)
 			{
 				rowf = pointsMap.ptr<float>(y);
@@ -175,7 +144,6 @@ namespace RouteAnalyzer
 			}
 			imwrite(*outPath + "pointsMap.bmp", MapImg);
 		}
-
 		void GettingDispersion(Mat &inImg, Mat &disp)
 		{
 			disp = Mat::zeros(inImg.rows, inImg.cols, CV_32F);
@@ -188,7 +156,6 @@ namespace RouteAnalyzer
 			int mV = 0;
 			int raz;
 			float ddx;
-
 			for (int y = options->DispWinSize / 2; y < inImg.rows - options->DispWinSize / 2; y++)
 			{
 				rowu = inImg.ptr<uchar>(y);
@@ -199,7 +166,6 @@ namespace RouteAnalyzer
 					for (int a = -options->DispWinSize / 2; a <= options->DispWinSize / 2; a++)
 					{
 						rowu2 = inImg.ptr<uchar>(y + a);
-
 						for (int b = -options->DispWinSize / 2; b <= options->DispWinSize / 2; b++)
 						{
 							raz += abs(rowu2[x + b] - rowu[x]);
@@ -212,7 +178,6 @@ namespace RouteAnalyzer
 					rowf[x] = ((float)raz) / dx;
 				}
 			}
-
 			ddx = ((float)mV) / dx;
 			for (int y = options->DispWinSize / 2; y < inImg.rows - options->DispWinSize / 2; y++)
 			{
@@ -225,7 +190,6 @@ namespace RouteAnalyzer
 			}
 			imwrite(*outPath + "dispersion.bmp", DispImg);
 		}
-
 		void Unite(Mat &pointsMap, Mat &disp)
 		{
 			Mat infMap = Mat::zeros(disp.rows, disp.cols, CV_32F);
@@ -241,7 +205,6 @@ namespace RouteAnalyzer
 			double znam = sqrt(coof1*coof1 + coof2*coof2);
 			double temp;
 			double mV = 0;
-
 			for (int y = 0; y < disp.rows; y++)
 			{
 				rowf = pointsMap.ptr<float>(y);
@@ -258,7 +221,6 @@ namespace RouteAnalyzer
 					rowf3[x] = temp;
 				}
 			}
-
 			ddx = mV / dx;
 			for (int y = 0; y < outImg.rows; y++)
 			{
@@ -277,7 +239,5 @@ namespace RouteAnalyzer
 			outBufMat = new Mat(outImg);
 			HasOutMat = true;
 		}
-
-
 	};
 }

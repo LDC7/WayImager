@@ -3,7 +3,6 @@
     using System.Drawing;
     using System.IO;
     using System.Windows.Media.Imaging;
-
     abstract class ConvertBitmapToBitmapImage
     {
         public static BitmapImage Convert(Bitmap src)

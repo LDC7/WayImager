@@ -7,15 +7,15 @@
         mc:Ignorable="d"
         Title="RouteAnalyzer" Height="201" Width="600" ResizeMode="NoResize">
     <Grid>
-        <Button x:Name="ButtonExit" Content="Выход" HorizontalAlignment="Left" Margin="435,135,0,0" VerticalAlignment="Top" Width="150" Click="ButtonExit_Click"/>
-        <Button x:Name="ButtonEvaluateMap" Content="Оценить ортофотоплан" HorizontalAlignment="Left" Margin="435,10,0,0" VerticalAlignment="Top" Width="150" Click="ButtonExecute_Click"/>
+        <Button x:Name="ButtonExit" Content="Выход" Margin="0,0,10,10" Width="150" Click="ButtonExit_Click" HorizontalContentAlignment="Center" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+        <Button x:Name="ButtonEvaluateMap" Content="Оценить ортофотоплан" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="150" Click="ButtonExecute_Click"/>
         <TextBox x:Name="TextBoxInPath" HorizontalAlignment="Left" Height="70" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="296" IsEnabled="False"/>
         <TextBox x:Name="TextBoxOutPath" HorizontalAlignment="Left" Height="70" Margin="10,85,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="296" IsEnabled="False"/>
         <Button x:Name="ButtonInputFile" Content="Выбрать файл" HorizontalAlignment="Left" Margin="311,60,0,0" VerticalAlignment="Top" Width="100" Click="ButtonInputFile_Click"/>
         <Button x:Name="ButtonOutFolder" Content="Выбрать папку" HorizontalAlignment="Left" Margin="311,135,0,0" VerticalAlignment="Top" Width="100" Click="ButtonOutFolder_Click"/>
-        <Button x:Name="ButtonEvaluateRoute" Content="Оценить маршрут" HorizontalAlignment="Left" Margin="435,35,0,0" VerticalAlignment="Top" Width="150" Click="ButtonEvaluateRoute_Click"/>
-        <Button x:Name="ButtonOptions" Content="Настройки" HorizontalAlignment="Left" Margin="435,85,0,0" VerticalAlignment="Top" Width="150" Click="ButtonOptions_Click"/>
-        <Button x:Name="ButtonLoadMap" Content="Загрузить ортофотоплан" HorizontalAlignment="Left" Margin="435,60,0,0" VerticalAlignment="Top" Width="150" Click="ButtonLoadMap_Click"/>
+        <Button x:Name="ButtonEvaluateRoute" Content="Оценить маршрут" HorizontalAlignment="Right" Margin="0,35,9,0" VerticalAlignment="Top" Width="150" Click="ButtonEvaluateRoute_Click"/>
+        <Button x:Name="ButtonOptions" Content="Настройки" HorizontalAlignment="Right" Margin="0,85,10,0" VerticalAlignment="Top" Width="150" Click="ButtonOptions_Click"/>
+        <Button x:Name="ButtonLoadMap" Content="Загрузить ортофотоплан" HorizontalAlignment="Right" Margin="0,60,10,0" VerticalAlignment="Top" Width="150" Click="ButtonLoadMap_Click"/>
 
     </Grid>
 </Window>

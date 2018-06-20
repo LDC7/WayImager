@@ -6,13 +6,11 @@
     using System.Text;
     using System.Windows;
     using System.Windows.Forms;
-
     public partial class GPSWindow : Window
     {
         private ObservableCollection<Point> data { get; set; }
         private ObservableCollection<Point> points;
         private int width, height;
-
         public GPSWindow(ObservableCollection<Point> points, int w, int h)
         {
             InitializeComponent();
@@ -21,12 +19,10 @@
             height = h;
             this.points = points;
         }
-
         private void ButtonExit_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
-
         private void ButtonOK_Click(object sender, RoutedEventArgs e)
         {
             Point p1, p2;
@@ -53,7 +49,6 @@
                 }
             }
         }
-
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
             Point p1, p2;
@@ -74,7 +69,6 @@
                     double coof = diag / diagc;
                     double ang;
                     double diagAngC = Math.Atan2(p1.Y - p2.Y, p1.X - p2.X) + Math.PI / 2;
-
                     StringBuilder sb = new StringBuilder();
                     foreach (var d in points)
                     {
@@ -83,7 +77,7 @@
                         x = p1.X + (d.X * coof * Math.Cos(ang));
                         y = p1.Y + (d.Y * coof * Math.Cos(ang + Math.PI / 2));
                         x = ToInterval(x, 180);
-                        y= ToInterval(y, 90);
+                        y = ToInterval(y, 90);
                         sb.Append($"{x};{y};{Environment.NewLine}");
                     }
                     byte[] buf = Encoding.UTF8.GetBytes(sb.ToString());
@@ -94,7 +88,6 @@
                 }
             }
         }
-
         private bool checkTextBoxes()
         {
             double buf;
@@ -113,13 +106,11 @@
             }
             return false;
         }
-
         private void getPoints(out Point p1, out Point p2)
         {
             p1 = new Point(double.Parse(TextBoxLongL.Text), double.Parse(TextBoxLatL.Text));
             p2 = new Point(double.Parse(TextBoxLongR.Text), double.Parse(TextBoxLatR.Text));
         }
-
         private double ToInterval(double i, int inter)
         {
             double x = i;
@@ -132,6 +123,45 @@
                 x += inter;
             }
             return x;
+        }
+        Tuple<double, double> GetFactMercatorsProjection(double Long, double Lat)
+        {
+            double mercX, mercY;
+            double MAX_LAT = 89.5;
+            double R_MAJOR = 6378137.0;
+            double R_MINOR = 6356752.3142;
+            double ECCENT = Math.Sqrt(1.0 - Math.Pow(R_MINOR / R_MAJOR, 2));
+            double ECCNTH = ECCENT * 0.5;
+            mercX = Long * R_MAJOR;
+            if (Lat > MAX_LAT) Lat = MAX_LAT;
+            if (Lat < -MAX_LAT) Lat = -MAX_LAT;
+            double phi = Lat;
+            double con = ECCENT * Math.Sin(phi);
+            con = Math.Pow((1.0 - con) / (1.0 + con), ECCNTH);
+            mercY = -R_MAJOR * Math.Log(Math.Tan(0.5 * (Math.PI / 2.0 - phi)) / con);
+            return new Tuple<double, double>(mercX, mercY);
+        }
+        Tuple<double, double> GetCalcCoordinates(double mercX, double mercY)
+        {
+            double Long, Lat;
+            double MAX_LAT = 89.5;
+            double R_MAJOR = 6378137.0;
+            double R_MINOR = 6356752.3142;
+            double ECCENT = Math.Sqrt(1.0 - Math.Pow(R_MINOR / R_MAJOR, 2));
+            double ECCNTH = ECCENT * 0.5;
+            Long = mercX / R_MAJOR;
+            double ts = Math.Exp(-mercY / R_MAJOR);
+            double phi = Math.PI * 0.5 - 2.0 * Math.Atan(ts);
+            uint i = 0;
+            double dPhi = 1;
+            while ((dPhi >= 0 ? dPhi : -dPhi) > 0.000000001 && i++ < 15)
+            {
+                double con = ECCENT * Math.Sin(phi);
+                dPhi = Math.PI * 0.5 - 2.0 * Math.Atan(ts * Math.Pow((1.0 - con) / (1.0 + con), ECCNTH)) - phi;
+                phi += dPhi;
+            }
+            Lat = phi;
+            return new Tuple<double, double>(Long, Lat);
         }
     }
 }

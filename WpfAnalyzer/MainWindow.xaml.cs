@@ -8,11 +8,9 @@
     using System.Text;
     using System.Windows;
     using System.Windows.Forms;
-
     public partial class MainWindow : Window
     {
         private Filter filter;
-
         public MainWindow()
         {
             InitializeComponent();
@@ -22,15 +20,12 @@
             TextBoxOutPath.Text = $"{progFolder}\\temp\\";
             TextBoxInPath.Text = $"{progFolder}\\input.png";
             filter.SetPaths(TextBoxInPath.Text, TextBoxOutPath.Text);
-
             filter.pointMethod = MethodFactory.GetMethod(-1);
         }
-
         private void ButtonExit_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
-
         private void ButtonExecute_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -44,7 +39,6 @@
                 System.Windows.MessageBox.Show(ex.Message, "ERROR", MessageBoxButton.OK);
             }
         }
-
         private void ButtonInputFile_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
@@ -56,7 +50,6 @@
                 filter.SetPaths(TextBoxInPath.Text, TextBoxOutPath.Text);
             }
         }
-
         private void ButtonOutFolder_Click(object sender, RoutedEventArgs e)
         {
             FolderBrowserDialog fbd = new FolderBrowserDialog();
@@ -67,7 +60,6 @@
                 filter.SetPaths(TextBoxInPath.Text, TextBoxOutPath.Text);
             }
         }
-
         private string GetExceptionsLog(Exception ex)
         {
             string str = ex.Message + '\n';
@@ -75,10 +67,8 @@
             {
                 str = str + GetExceptionsLog(ex.InnerException);
             }
-
             return str;
         }
-
         private void ButtonEvaluateRoute_Click(object sender, RoutedEventArgs e)
         {
             if (filter.HasOutMat)
@@ -92,7 +82,6 @@
                 System.Windows.MessageBox.Show("Отсутствует загруженная карта информативности.", "ERROR", MessageBoxButton.OK);
             }
         }
-
         private void ButtonLoadMap_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
@@ -103,7 +92,6 @@
                 filter.LoadBufferMat(ofd.FileName);
             }
         }
-
         private void ButtonOptions_Click(object sender, RoutedEventArgs e)
         {
             OptionWindow ow = new OptionWindow(filter);

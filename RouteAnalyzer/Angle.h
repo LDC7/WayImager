@@ -1,25 +1,20 @@
 #pragma once
-
 #define PI 3.14159265358979323846
-
 namespace RouteAnalyzer
 {
 	public ref class Angle
 	{
 	private:
 		float angle;
-
 	public:
 		Angle(float val)
 		{
 			SetAngle(val);
 		}
-
 		float GetAngle()
 		{
 			return angle;
 		}
-
 		void SetAngle(float val)
 		{
 			angle = val;
@@ -32,11 +27,9 @@ namespace RouteAnalyzer
 				angle += 360;
 			}
 		}
-
 		double ToRad()
 		{
 			return (double)(PI * angle / 180);
 		}
 	};
 }
-
