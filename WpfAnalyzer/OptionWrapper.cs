@@ -25,7 +25,7 @@
             _minLvlForDensityMap = options.MinLvlForDensityMap;
             _maxLvlForDensityMap = options.MaxLvlForDensityMap;
             _coefficientForDensity = options.CoefficientForDensity;
-            _coefficientForDispersion = options.CoefficientForDensity;
+            _coefficientForDispersion = options.CoefficientForDispersion;
             _minLimitForInfMap = options.MinLimitForInfMap;
         }
         public string densityWinSize
@@ -159,7 +159,7 @@
             op.MinLvlForDensityMap = _minLvlForDensityMap;
             op.MaxLvlForDensityMap = _maxLvlForDensityMap;
             op.CoefficientForDensity = _coefficientForDensity;
-            op.CoefficientForDensity = _coefficientForDispersion;
+            op.CoefficientForDispersion = _coefficientForDispersion;
             op.MinLimitForInfMap = _minLimitForInfMap;
             return op;
         }
