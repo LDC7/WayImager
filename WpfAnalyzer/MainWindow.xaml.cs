@@ -2,12 +2,11 @@
 {
     using RouteAnalyzer;
     using System;
-    using System.ComponentModel;
     using System.IO;
     using System.Reflection;
-    using System.Text;
     using System.Windows;
     using System.Windows.Forms;
+
     public partial class MainWindow : Window
     {
         private Filter filter;

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfAnalyzer"
         mc:Ignorable="d"
-        Title="Настройки" Height="494.88" Width="556.182" ResizeMode="NoResize">
+        Title="Настройки" Height="492.88" Width="556.182" ResizeMode="NoResize">
     <Grid>
         <Label Content="Поиск опорных точек" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
         <Label Content="Метод:" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
@@ -33,8 +33,8 @@
         <TextBox x:Name="TextBoxWidth" HorizontalAlignment="Left" Height="23" Margin="95,402,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="100" TextAlignment="Right" Text="{Binding Path=widthCamera}"/>
         <TextBox x:Name="TextBoxHeight" HorizontalAlignment="Left" Height="23" Margin="221,402,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="100" TextAlignment="Right" Text="{Binding Path=heightCamera}"/>
         <Label Content="x" HorizontalAlignment="Left" Margin="200,399,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="ButtonOK" Content="OK" HorizontalAlignment="Left" Margin="385,436,0,0" VerticalAlignment="Top" Width="75" Click="ButtonOK_Click"/>
-        <Button x:Name="ButtonExit" Content="Закрыть" HorizontalAlignment="Left" Margin="465,436,0,0" VerticalAlignment="Top" Width="75" Click="ButtonExit_Click"/>
+        <Button x:Name="ButtonOK" Content="OK" HorizontalAlignment="Left" Margin="385,433,0,0" VerticalAlignment="Top" Width="75" Click="ButtonOK_Click"/>
+        <Button x:Name="ButtonExit" Content="Закрыть" HorizontalAlignment="Left" Margin="465,433,0,0" VerticalAlignment="Top" Width="75" Click="ButtonExit_Click"/>
 
     </Grid>
 </Window>

@@ -82,7 +82,7 @@ namespace RouteAnalyzer
             return a > 255 ? 255 : a;
         }
     public:
-        List<Route^>^ AlternativePaths(Route^ route, int minVal)
+        List<Route^>^ AlternativePaths(Route^ route, int minVal, int maxIters)
         {
             List<List<ImgPoint^>^>^ temp;
             List<List<ImgPoint^>^>^ temp2;
@@ -98,7 +98,7 @@ namespace RouteAnalyzer
                 }
                 if (route->Parts[i]->min < minVal)
                 {
-                    temp = SearchAltRoutePart(route->Parts[i], minVal);
+                    temp = SearchAltRoutePart(route->Parts[i], minVal, maxIters);
                     if (temp->Count == 0)
                     {
                         return gcnew List<Route^>();
@@ -144,7 +144,7 @@ namespace RouteAnalyzer
             return list;
         }
     private:
-        List<List<ImgPoint^>^>^ SearchAltRoutePart(RoutePart^ part, int mVal)
+        List<List<ImgPoint^>^>^ SearchAltRoutePart(RoutePart^ part, int mVal, int maxIters)
         {
             List<List<ImgPoint^>^>^ buf = gcnew List<List<ImgPoint^>^>();
             int pFromInd;
@@ -176,13 +176,13 @@ namespace RouteAnalyzer
             {
                 if (leftFlag)
                 {
-                    temp = SearchAltTrajectory(part->IntermidiatePoints[i], part->IntermidiatePoints[pToInd], true, mVal);
+                    temp = SearchAltTrajectory(part->IntermidiatePoints[i], part->IntermidiatePoints[pToInd], true, mVal, maxIters);
                     if (temp->Count > 0)
                     {
                         leftFlag = false;
                         buf->Add(FindControlPoints(temp));
                     }
-                    temp = SearchAltTrajectory(part->IntermidiatePoints[i], part->pointEnd, true, mVal);
+                    temp = SearchAltTrajectory(part->IntermidiatePoints[i], part->pointEnd, true, mVal, maxIters);
                     if (temp->Count > 0)
                     {
                         leftFlag = false;
@@ -191,13 +191,13 @@ namespace RouteAnalyzer
                 }
                 if (rightFlag)
                 {
-                    temp = SearchAltTrajectory(part->IntermidiatePoints[i], part->IntermidiatePoints[pToInd], false, mVal);
+                    temp = SearchAltTrajectory(part->IntermidiatePoints[i], part->IntermidiatePoints[pToInd], false, mVal, maxIters);
                     if (temp->Count > 0)
                     {
                         rightFlag = false;
                         buf->Add(FindControlPoints(temp));
                     }
-                    temp = SearchAltTrajectory(part->IntermidiatePoints[i], part->pointEnd, false, mVal);
+                    temp = SearchAltTrajectory(part->IntermidiatePoints[i], part->pointEnd, false, mVal, maxIters);
                     if (temp->Count > 0)
                     {
                         rightFlag = false;
@@ -207,8 +207,12 @@ namespace RouteAnalyzer
             }
             return buf;
         }
-        List<ImgPoint^>^ SearchAltTrajectory(ImgPoint^ pS, ImgPoint^ pE, bool left, int mVal)
+        List<ImgPoint^>^ SearchAltTrajectory(ImgPoint^ pS, ImgPoint^ pE, bool left, int mVal, int maxIters)
         {
+			if (maxIters == 0)
+			{
+				return gcnew List<ImgPoint^>();
+			}
             Mat* mat = filter->outBufMat;
             List<ImgPoint^>^ list = gcnew List<ImgPoint^>();
             List<ImgPoint^>^ temp;
@@ -245,7 +249,7 @@ namespace RouteAnalyzer
                     GetPartValue(rp);
                     if (rp->min < mVal)
                     {
-                        temp = SearchAltTrajectory(p, pE, left, mVal);
+                        temp = SearchAltTrajectory(p, pE, left, mVal, maxIters--);
                         if (temp->Count == 0)
                         {
                             list = gcnew List<ImgPoint^>();

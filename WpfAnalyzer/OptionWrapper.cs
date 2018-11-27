@@ -16,6 +16,7 @@
         private int _coefficientForDensity;
         private int _coefficientForDispersion;
         private int _minLimitForInfMap;
+        private int _maxIters;
         public OptionWrapper(Options options)
         {
             _densityWinSize = options.MapWinSize;

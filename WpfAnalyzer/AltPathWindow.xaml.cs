@@ -42,35 +42,39 @@
         private void ButtonOK_Click(object sender, RoutedEventArgs e)
         {
             decimal minVal;
+            int maxIters;
             RouterWindow win;
             if (decimal.TryParse(TextBoxLimit.Text, out minVal))
             {
-                if (minVal < pointsMin)
+                if (int.TryParse(TextBoxMaxIters.Text, out maxIters))
                 {
-                    win = (RouterWindow)this.Owner;
-                    int mVal = (int)(minVal * 255);
-                    var list = router.AlternativePaths(route, mVal);
-                    if (list.Count > 0)
+                    if (minVal < pointsMin)
                     {
-                        foreach (var r in list)
+                        win = (RouterWindow)this.Owner;
+                        int mVal = (int)(minVal * 255);
+                        var list = router.AlternativePaths(route, mVal, maxIters > 0 ? maxIters : -1);
+                        if (list.Count > 0)
                         {
-                            r.Name = $"AltRoute{win.arni}";
-                            if (win.arni == int.MaxValue)
+                            foreach (var r in list)
                             {
-                                win.arni = int.MinValue;
+                                r.Name = $"AltRoute{win.arni}";
+                                if (win.arni == int.MaxValue)
+                                {
+                                    win.arni = int.MinValue;
+                                }
+                                router.CreateRouteValue(r);
+                                r.Evaluated = true;
+                                win.arni++;
+                                win.data.Add(r);
                             }
-                            router.CreateRouteValue(r);
-                            r.Evaluated = true;
-                            win.arni++;
-                            win.data.Add(r);
+                        }
+                        else
+                        {
+                            System.Windows.MessageBox.Show("Альтернативных маршрутов не найдено.", "ERROR", MessageBoxButton.OK);
                         }
                     }
-                    else
-                    {
-                        System.Windows.MessageBox.Show("Альтернативных маршрутов не найдено.", "ERROR", MessageBoxButton.OK);
-                    }
+                    Close();
                 }
-                Close();
             }
         }
     }

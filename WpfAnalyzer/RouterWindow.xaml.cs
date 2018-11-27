@@ -54,18 +54,21 @@
         }
         private void ButtonOpen_Click(object sender, RoutedEventArgs e)
         {
-            Route r = data[RoutesDataGrid.SelectedIndex];
-            data.RemoveAt(RoutesDataGrid.SelectedIndex);
-            RouteWindow rw;
-            if (inpBmp != null)
+            if (RoutesDataGrid.SelectedIndex < RoutesDataGrid.Items.Count)
             {
-                rw = new RouteWindow(this, inpBmp, ref data, r);
+                Route r = data[RoutesDataGrid.SelectedIndex];
+                data.RemoveAt(RoutesDataGrid.SelectedIndex);
+                RouteWindow rw;
+                if (inpBmp != null)
+                {
+                    rw = new RouteWindow(this, inpBmp, ref data, r);
+                }
+                else
+                {
+                    rw = new RouteWindow(this, infBmp, ref data, r);
+                }
+                rw.Show();
             }
-            else
-            {
-                rw = new RouteWindow(this, infBmp, ref data, r);
-            }
-            rw.Show();
         }
         private void ButtonEvaluate_Click(object sender, RoutedEventArgs e)
         {

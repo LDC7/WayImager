@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfAnalyzer"
         mc:Ignorable="d"
-        Title="Альтернативные маршруты" Height="248" Width="374" ResizeMode="NoResize">
+        Title="Альтернативные маршруты" Height="272.5" Width="374" ResizeMode="NoResize">
     <Grid>
         <Button x:Name="ButtonOK" Content="OK" HorizontalAlignment="Right" Margin="0,0,101,10" VerticalAlignment="Bottom" Width="75" Click="ButtonOK_Click"/>
         <Button x:Name="ButtonExit" Content="Закрыть" Margin="0,0,10,10" Click="ButtonExit_Click" Width="75" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
@@ -19,6 +19,9 @@
         <Label x:Name="LabalMax" Content="" HorizontalAlignment="Left" Margin="176,72,0,0" VerticalAlignment="Top"/>
         <Label x:Name="LabalMin" Content="" HorizontalAlignment="Left" Margin="176,41,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="TextBoxLimit" HorizontalAlignment="Left" Height="23" Margin="176,138,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="150"/>
+        <Label Content="Максимум итераций:" HorizontalAlignment="Left" Margin="10,165,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="TextBoxMaxIters" HorizontalAlignment="Left" Height="23" Margin="176,168,0,0" TextWrapping="Wrap" Text="10000" VerticalAlignment="Top" Width="150"/>
+        <Label Content="0 - без лимита итераций" HorizontalAlignment="Left" Margin="10,185,0,0" VerticalAlignment="Top" FontSize="8"/>
 
     </Grid>
 </Window>
